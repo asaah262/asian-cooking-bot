@@ -1,0 +1,61 @@
+[33mWARNING[0m:  [21-05-2026 17:56:19] chroma_server_nofile is set to 65535, but this is less than current soft limit of 1048575. chroma_server_nofile will not be set.
+[32mINFO[0m:     [21-05-2026 17:56:19] Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+[36mDEBUG[0m:    [21-05-2026 17:56:19] Starting component System
+[36mDEBUG[0m:    [21-05-2026 17:56:19] Starting component OpenTelemetryClient
+[36mDEBUG[0m:    [21-05-2026 17:56:19] Starting component SqliteDB
+[36mDEBUG[0m:    [21-05-2026 17:56:19] Starting component SimpleQuotaEnforcer
+[36mDEBUG[0m:    [21-05-2026 17:56:19] Starting component Posthog
+[36mDEBUG[0m:    [21-05-2026 17:56:19] Starting component SimpleRateLimitEnforcer
+[36mDEBUG[0m:    [21-05-2026 17:56:19] Starting component LocalSegmentManager
+[36mDEBUG[0m:    [21-05-2026 17:56:19] Starting component LocalExecutor
+[36mDEBUG[0m:    [21-05-2026 17:56:19] Starting component SegmentAPI
+[31mERROR[0m:    [21-05-2026 17:56:19] Failed to send telemetry event ServerStartEvent: capture() takes 1 positional argument but 3 were given
+[32mINFO[0m:     [21-05-2026 17:56:19] Started server process [[36m61024[0m]
+[32mINFO[0m:     [21-05-2026 17:56:19] Waiting for application startup.
+[32mINFO[0m:     [21-05-2026 17:56:19] Application startup complete.
+[32mINFO[0m:     [21-05-2026 17:56:19] Uvicorn running on [1mhttp://localhost:8000[0m (Press CTRL+C to quit)
+[32mINFO[0m:     [21-05-2026 17:56:34] Shutting down
+[32mINFO[0m:     [21-05-2026 17:56:34] Waiting for application shutdown.
+[36mDEBUG[0m:    [21-05-2026 17:56:34] Stopping component System
+[36mDEBUG[0m:    [21-05-2026 17:56:34] Stopping component SegmentAPI
+[36mDEBUG[0m:    [21-05-2026 17:56:34] Stopping component LocalExecutor
+[36mDEBUG[0m:    [21-05-2026 17:56:34] Stopping component LocalSegmentManager
+[36mDEBUG[0m:    [21-05-2026 17:56:34] Stopping component SimpleRateLimitEnforcer
+[36mDEBUG[0m:    [21-05-2026 17:56:34] Stopping component Posthog
+[36mDEBUG[0m:    [21-05-2026 17:56:34] Stopping component SimpleQuotaEnforcer
+[36mDEBUG[0m:    [21-05-2026 17:56:34] Stopping component SqliteDB
+[36mDEBUG[0m:    [21-05-2026 17:56:34] Stopping component OpenTelemetryClient
+[32mINFO[0m:     [21-05-2026 17:56:34] Application shutdown complete.
+[32mINFO[0m:     [21-05-2026 17:56:34] Finished server process [[36m61024[0m]
+[33mWARNING[0m:  [21-05-2026 17:56:38] chroma_server_nofile is set to 65535, but this is less than current soft limit of 1048575. chroma_server_nofile will not be set.
+[32mINFO[0m:     [21-05-2026 17:56:38] Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+[36mDEBUG[0m:    [21-05-2026 17:56:38] Starting component System
+[36mDEBUG[0m:    [21-05-2026 17:56:38] Starting component OpenTelemetryClient
+[36mDEBUG[0m:    [21-05-2026 17:56:38] Starting component SqliteDB
+[36mDEBUG[0m:    [21-05-2026 17:56:38] Starting component SimpleQuotaEnforcer
+[36mDEBUG[0m:    [21-05-2026 17:56:38] Starting component Posthog
+[36mDEBUG[0m:    [21-05-2026 17:56:38] Starting component SimpleRateLimitEnforcer
+[36mDEBUG[0m:    [21-05-2026 17:56:38] Starting component LocalSegmentManager
+[36mDEBUG[0m:    [21-05-2026 17:56:38] Starting component LocalExecutor
+[36mDEBUG[0m:    [21-05-2026 17:56:38] Starting component SegmentAPI
+[31mERROR[0m:    [21-05-2026 17:56:38] Failed to send telemetry event ServerStartEvent: capture() takes 1 positional argument but 3 were given
+[32mINFO[0m:     [21-05-2026 17:56:38] Started server process [[36m61236[0m]
+[32mINFO[0m:     [21-05-2026 17:56:38] Waiting for application startup.
+[32mINFO[0m:     [21-05-2026 17:56:38] Application startup complete.
+[32mINFO[0m:     [21-05-2026 17:56:38] Uvicorn running on [1mhttp://localhost:8000[0m (Press CTRL+C to quit)
+[32mINFO[0m:     [21-05-2026 17:56:50] ::1:57550 - "GET / HTTP/1.1" 404
+[32mINFO[0m:     [21-05-2026 17:57:19] ::1:57706 - "GET / HTTP/1.1" 404
+[32mINFO[0m:     [21-05-2026 17:57:19] ::1:57706 - "GET /favicon.ico HTTP/1.1" 404
+[32mINFO[0m:     [21-05-2026 17:57:42] Shutting down
+[32mINFO[0m:     [21-05-2026 17:57:42] Waiting for application shutdown.
+[36mDEBUG[0m:    [21-05-2026 17:57:42] Stopping component System
+[36mDEBUG[0m:    [21-05-2026 17:57:42] Stopping component SegmentAPI
+[36mDEBUG[0m:    [21-05-2026 17:57:42] Stopping component LocalExecutor
+[36mDEBUG[0m:    [21-05-2026 17:57:42] Stopping component LocalSegmentManager
+[36mDEBUG[0m:    [21-05-2026 17:57:42] Stopping component SimpleRateLimitEnforcer
+[36mDEBUG[0m:    [21-05-2026 17:57:42] Stopping component Posthog
+[36mDEBUG[0m:    [21-05-2026 17:57:42] Stopping component SimpleQuotaEnforcer
+[36mDEBUG[0m:    [21-05-2026 17:57:42] Stopping component SqliteDB
+[36mDEBUG[0m:    [21-05-2026 17:57:42] Stopping component OpenTelemetryClient
+[32mINFO[0m:     [21-05-2026 17:57:42] Application shutdown complete.
+[32mINFO[0m:     [21-05-2026 17:57:42] Finished server process [[36m61236[0m]

@@ -1,0 +1,71 @@
+{
+  "summary": {
+    "iteration": "v2",
+    "chunk_size": "500",
+    "chunk_overlap": "150",
+    "timestamp": "2026-05-25T16:25:49.364430",
+    "rouge_scores": {
+      "rouge1": 0.0856044288458033,
+      "rouge2": 0.021980936488709173,
+      "rougeL": 0.06919677268566811,
+      "rougeLsum": 0.07416370266341678
+    },
+    "langsmith_experiments": {
+      "correctness": "cooking-bot-v2",
+      "hallucination": "cooking-bot-v2-hallucination"
+    },
+    "langsmith_url": "https://smith.langchain.com"
+  },
+  "details": [
+    {
+      "question": "How do I make pho broth from scratch?",
+      "answer": "To make pho broth from scratch, you will need the following ingredients: 1 kg of beef bones (a mix of neck, knuckles, and marrow bones is recommended for flavor), 1 kg of beef shank or brisket, 1 peeled onion, about 4 stalks of bruised lemongrass, a piece of rock sugar, and 2 tablespoons of salt. \n\nStart by placing the beef bones in a pot filled with water and bring it to a boil over high heat. After boiling for about 5 to 10 minutes, you will see impurities rise to the top. Dump out the whole pot and rinse the bones under running water to reduce the smell and keep the broth clear.\n\nNext, add the rinsed bones back into a clean pot, along with the beef shank, peeled onion, bruised lemongrass, rock sugar, and salt. Bring the mixture to a boil, then lower the heat and cook for about 60-90 minutes, skimming occasionally. This method will help you achieve a flavorful and clear broth for your pho.\n\nThis information comes from a cooking video by Helen.",
+      "reference": "Simmer beef bones for several hours with spices like star anise, cinnamon, and cloves to make pho broth."
+    },
+    {
+      "question": "What are the key ingredients in Pad Thai?",
+      "answer": "I don't have that in my cooking video database.",
+      "reference": "Pad Thai uses rice noodles, tamarind paste, fish sauce, eggs, bean sprouts, and peanuts."
+    },
+    {
+      "question": "How do I make Mapo Tofu?",
+      "answer": "To make Mapo Tofu, you can follow the instructions from the video on Pai's Kitchen. Here\u2019s a summary of the process:\n\n1. **Ingredients**: Gather the necessary ingredients, which are widely available at Asian grocery stores. This includes soft tofu and a rich, flavorful meat sauce that is spicy with a touch of numbness, characteristic of Sichuan cuisine.\n\n2. **Prepare the Tofu**: Cut the soft tofu into big cubes.\n\n3. **Cooking the Sauce**: Before adding the tofu, make sure to taste the sauce for seasoning. It's important to do this before adding the tofu to avoid stirring it too much, which could cause the tofu to fall apart.\n\n4. **Simmering**: Gently slide the tofu into the sauce and let it simmer for a few minutes. This allows the tofu to absorb some of the flavor.\n\n5. **Finishing Touches**: Optionally, you can drizzle some chili oil on top of the tofu before serving.\n\n6. **Serving**: Let the tofu air out a bit after cooking, as it can be very hot. Enjoy the flavor explosion of salty, spicy, and numbing sensations combined with the creamy texture of the tofu.\n\nThis method is from the video on Pai's Kitchen, where the dish is described as easy to make and delicious.",
+      "reference": "Mapo Tofu is made with soft tofu, doubanjiang (spicy bean paste), ground pork, and Sichuan peppercorns."
+    },
+    {
+      "question": "What can I substitute for lemongrass?",
+      "answer": "According to the cooking video context, if you really can't find lemongrass, lime zest does a decent job as a substitute. However, it's important to note that lemongrass also comes frozen and dried, and if you're using dried lemongrass, you should use more of it. This information comes from a cooking video, but the specific channel is not mentioned.",
+      "reference": "Lemongrass can be substituted with lemon zest combined with a small amount of ginger."
+    },
+    {
+      "question": "How long should I simmer pho bones?",
+      "answer": "I don't have that in my cooking video database.",
+      "reference": "Pho bones should simmer for at least 6 to 8 hours to extract maximum flavor."
+    },
+    {
+      "question": "How do I make Char Siu pork?",
+      "answer": "To make Char Siu pork, you will need to follow these steps based on the cooking video from The Woks of Life channel:\n\n1. **Select Your Meat**: Use a pork butt boneless shoulder roast for the best results. You can also use a whole fresh ham if you want to save money. Leaner cuts like tenderloin or pork loin can be used, but they will be less juicy and flavorful.\n\n2. **Cut the Meat**: Cut the pork into pieces.\n\n3. **Make the Marinade**: For the marinade, you will need:\n   - Sesame oil\n   - Shaoxing wine\n   - Soy sauce\n   - Hoisin sauce\n   - Grandma molasses (or honey as a substitute)\n   - Five spice powder\n   - White pepper\n   - Maltose (or honey if you don't have maltose)\n\n4. **Marinate the Meat**: Marinade the cut pieces of pork and then put it in the fridge overnight.\n\n5. **Roasting**: The next day, roast the marinated pork. Use a rack with some water in a pan (you can use a sheet pan or a deeper pan). Start roasting at high heat, then lower the temperature. During roasting, baste the pork.\n\n6. **Serving Suggestions**: You can serve the Char Siu with various dishes like pork fried rice, stir-fries, or roast pork puffs.\n\nThis method allows you to make Char Siu at home, which can be more cost-effective and potentially tastier than restaurant versions. Enjoy your cooking!",
+      "reference": "Char Siu is made by marinating pork in honey, soy sauce, hoisin, and Chinese five spice, then roasting until caramelized."
+    },
+    {
+      "question": "What vegetables are used in Vietnamese spring rolls?",
+      "answer": "In the context of the cooking video, the vegetables used in Vietnamese spring rolls include onions, spring onions, and bean sprouts. The bean sprouts are blanched in hot water for about 10 seconds. This information comes from the video about making Vietnamese fresh spring rolls.",
+      "reference": "Vietnamese spring rolls typically use lettuce, fresh mint, cilantro, cucumber, and rice paper wrappers."
+    },
+    {
+      "question": "How do I prevent dumplings from sticking?",
+      "answer": "I don't have that in my cooking video database.",
+      "reference": "To prevent dumplings from sticking, dust with flour, use parchment paper, or pan-fry with water then let it evaporate."
+    },
+    {
+      "question": "What makes Tom Yum soup spicy?",
+      "answer": "Tom Yum soup gets its spiciness from the addition of chilies, specifically Thai chili paste or Thai chili jam, which is a key ingredient. The recipe suggests adding as much chili as desired for heat, but even one chili can make it a little spicy. The combination of these chilies with other ingredients like garlic and shallots also contributes to the overall spiciness of the soup. This information comes from a cooking video focused on Tom Yum soup.",
+      "reference": "Tom Yum gets its heat from fresh chilies and its aroma from lemongrass, galangal, and kaffir lime leaves."
+    },
+    {
+      "question": "How do I cook Kung Pao chicken?",
+      "answer": "To cook Kung Pao chicken, you can follow these steps based on the video from Jet Tila's channel, \"Ready Jet Cook\":\n\n1. **Marinate the Chicken**: Use boneless chicken thighs and marinate them with baking soda (to tenderize), cornstarch (to pull in flavors), a little water, oil (to prevent sticking), and soy sauce (for flavor and tenderness). Let it marinate for about 10 to 15 minutes.\n\n2. **Prepare the Kung Pao Sauce**: Start with oyster sauce and black vinegar. Add Chinese chili garlic sauce for heat and umami flavors. Use Chinese chicken powder for seasoning, but be careful as it can numb the tongue if used excessively. To thicken the sauce, make a slurry by mixing cornstarch with water, then stir it into the sauce to achieve a glaze consistency.\n\n3. **Cook the Chicken**: After marinating, stir-fry the chicken quickly in a wok along with vegetables and aromatics until cooked through.\n\n4. **Combine**: Add the prepared Kung Pao sauce to the cooked chicken and vegetables, mixing everything together to ensure the flavors meld.\n\n5. **Serve**: Enjoy your homemade Kung Pao chicken, which is a classic dish from Sichuan Province known for its sweet, sour, and spicy flavors.\n\nThis method is based on Jet Tila's cooking video, which emphasizes the importance of marinating and the balance of flavors in the dish.",
+      "reference": "Kung Pao chicken is stir-fried with dried chilies, Sichuan peppercorns, peanuts, and a sweet-savory sauce."
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "summary": {
+    "iteration": "v1",
+    "chunk_size": "1000",
+    "chunk_overlap": "100",
+    "timestamp": "2026-05-22T19:56:16.924042",
+    "rouge_scores": {
+      "rouge1": 0.14693513951841902,
+      "rouge2": 0.05433230965220992,
+      "rougeL": 0.12740343143095434,
+      "rougeLsum": 0.13366316260084835
+    },
+    "langsmith_experiments": {
+      "correctness": "cooking-bot-v1",
+      "hallucination": "cooking-bot-v1-hallucination"
+    },
+    "langsmith_url": "https://smith.langchain.com"
+  },
+  "details": [
+    {
+      "question": "How do I make pho broth from scratch?",
+      "answer": "To make pho broth from scratch, follow these steps:\n\n1. **Prepare the Bones**: Start with 1 kg of beef bones (a mix of neck, knuckles, and marrow bones is recommended for flavor) and 1 kg of pork hock. Cut the pork hock into 1-inch sticks. Place the bones in a pot filled with water and bring to a boil over high heat. After boiling for about 5 to 10 minutes, you'll see impurities rise to the top. Dump out the whole pot and rinse the bones well under running water. This step is crucial for keeping the broth clear.\n\n2. **Cook the Broth**: Place the cleaned bones into a large pot filled with about 5 liters of water. Make sure the pot is clean to avoid contaminating the broth. Add a tablespoon of salt or sugar and one peeled onion to the pot. The onion helps keep the broth clear and adds flavor.\n\n3. **Simmer**: Bring the pot to a boil again, then lower the heat to medium and cook for about one to two hours. Do not cover the pot, and occasionally skim off the scum and fat that rises to the surface.\n\n4. **Add Aromatics**: For flavor, you will need about two pieces of ginger (sliced), three star anise, two cinnamon sticks, and one onion (halved). Grill the ginger and onion directly on an open flame until charred to enhance their aroma. Add these grilled aromatics to the pot.\n\n5. **Season the Broth**: After simmering, you can add additional seasonings like rock sugar, fish sauce, stock powder, Vietnamese shrimp paste, and salt to taste.\n\n6. **Strain the Broth**: Once the broth is cooked and flavorful, strain it to remove the solids, and you will have a clear and aromatic pho broth ready for serving with noodles and your choice of meat.\n\nEnjoy your homemade pho!",
+      "reference": "Simmer beef bones for several hours with spices like star anise, cinnamon, and cloves to make pho broth."
+    },
+    {
+      "question": "What are the key ingredients in Pad Thai?",
+      "answer": "I'm sorry, but the context provided does not include information about the key ingredients in Pad Thai.",
+      "reference": "Pad Thai uses rice noodles, tamarind paste, fish sauce, eggs, bean sprouts, and peanuts."
+    },
+    {
+      "question": "How do I make Mapo Tofu?",
+      "answer": "To make Mapo Tofu, follow these steps based on the context provided:\n\n1. **Ingredients**: Gather the key ingredients:\n   - Sichuan peppercorns (red or green)\n   - Soft tofu (also referred to as smooth or traditional tofu)\n   - Ground beef (or ground pork)\n   - Soy sauce\n   - Chili oil (optional)\n   - Green onions (for garnish)\n   - Other seasonings as desired\n\n2. **Prepare the Sichuan Peppercorns**: Toast the Sichuan peppercorns in a dry pan until fragrant, then grind them using a mortar and pestle until you have smaller flakes.\n\n3. **Cook the Ground Meat**: In a pan, saut\u00e9 the ground beef (or pork) without adding oil, allowing the fat to render out. Season the meat with soy sauce while cooking.\n\n4. **Add the Tofu**: Cut the soft tofu into big cubes and gently add them to the pan with the cooked meat. Carefully nudge the tofu to ensure it sits in the sauce without breaking apart.\n\n5. **Simmer**: Let the mixture simmer for a few minutes to allow the tofu to absorb the flavors from the sauce.\n\n6. **Finish the Dish**: Optionally, drizzle some chili oil over the top for extra spiciness and garnish with chopped green onions for freshness.\n\n7. **Serve**: Serve the Mapo Tofu hot, ideally with steamed white rice.\n\nEnjoy your flavorful and spicy Mapo Tofu!",
+      "reference": "Mapo Tofu is made with soft tofu, doubanjiang (spicy bean paste), ground pork, and Sichuan peppercorns."
+    },
+    {
+      "question": "What can I substitute for lemongrass?",
+      "answer": "The context does not provide a specific substitute for lemongrass. It mentions that if you use dry lemongrass, you should use more of it, but it does not suggest any other alternatives. Therefore, I cannot provide an answer based on the context.",
+      "reference": "Lemongrass can be substituted with lemon zest combined with a small amount of ginger."
+    },
+    {
+      "question": "How long should I simmer pho bones?",
+      "answer": "The context does not provide specific information about simmering pho bones. It mentions simmering the broth for about 60-90 minutes after bringing it to a boil, but it does not specify the exact time for pho bones. Therefore, I cannot provide a definitive answer based on the context.",
+      "reference": "Pho bones should simmer for at least 6 to 8 hours to extract maximum flavor."
+    },
+    {
+      "question": "How do I make Char Siu pork?",
+      "answer": "I'm sorry, but I don't have the information on how to make Char Siu pork based on the provided context.",
+      "reference": "Char Siu is made by marinating pork in honey, soy sauce, hoisin, and Chinese five spice, then roasting until caramelized."
+    },
+    {
+      "question": "What vegetables are used in Vietnamese spring rolls?",
+      "answer": "The vegetables used in Vietnamese spring rolls include spring onions, Asian Thai basil, salted herbs, bean sprouts, and cucumber.",
+      "reference": "Vietnamese spring rolls typically use lettuce, fresh mint, cilantro, cucumber, and rice paper wrappers."
+    },
+    {
+      "question": "How do I prevent dumplings from sticking?",
+      "answer": "I'm sorry, but the provided context does not include information on preventing dumplings from sticking.",
+      "reference": "To prevent dumplings from sticking, dust with flour, use parchment paper, or pan-fry with water then let it evaporate."
+    },
+    {
+      "question": "What makes Tom Yum soup spicy?",
+      "answer": "Tom Yum soup gets its spiciness primarily from the addition of Thai chilies. The chilies can be pounded into a paste or added whole, depending on the desired level of heat. The amount of chilies used can be adjusted based on personal preference, allowing for a range of spiciness in the soup.",
+      "reference": "Tom Yum gets its heat from fresh chilies and its aroma from lemongrass, galangal, and kaffir lime leaves."
+    },
+    {
+      "question": "How do I cook Kung Pao chicken?",
+      "answer": "The context provided does not include a specific recipe for Kung Pao chicken. However, it mentions that you can make it with chicken or pork, and that ground chicken can be used. The general process involves cooking the chicken with a sauce that includes ingredients like soy sauce, sugar, and possibly other seasonings. \n\nFor a basic Kung Pao chicken recipe, you would typically:\n\n1. Cut chicken into small pieces.\n2. Stir-fry the chicken in a hot wok with oil until cooked through.\n3. Add a sauce made from soy sauce, sugar, and other ingredients.\n4. Optionally, add vegetables like bell peppers and peanuts.\n5. Serve with rice.\n\nIf you need a more detailed recipe, I recommend looking up a specific Kung Pao chicken recipe.",
+      "reference": "Kung Pao chicken is stir-fried with dried chilies, Sichuan peppercorns, peanuts, and a sweet-savory sauce."
+    }
+  ]
+}

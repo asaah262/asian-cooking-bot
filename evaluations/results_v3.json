@@ -1,0 +1,71 @@
+{
+  "summary": {
+    "iteration": "v3",
+    "chunk_size": "500",
+    "chunk_overlap": "150",
+    "timestamp": "2026-05-25T16:59:55.221078",
+    "rouge_scores": {
+      "rouge1": 0.09269191849537399,
+      "rouge2": 0.024622036303615483,
+      "rougeL": 0.07476621029512119,
+      "rougeLsum": 0.08102271057531771
+    },
+    "langsmith_experiments": {
+      "correctness": "cooking-bot-v3",
+      "hallucination": "cooking-bot-v3-hallucination"
+    },
+    "langsmith_url": "https://smith.langchain.com"
+  },
+  "details": [
+    {
+      "question": "How do I make pho broth from scratch?",
+      "answer": "To make pho broth from scratch, follow these step-by-step instructions:\n\n1. **Prepare the Bones**: Start with 1 kg of beef bones (a mix of neck, knuckles, and marrow bones is ideal for flavor). Place the bones in a pot filled with water and bring to a boil over high heat. \n\n2. **Parboil the Bones**: After boiling for about 5 to 10 minutes, you will see impurities rise to the top. Dump out the whole pot and rinse the bones under running water to reduce smell and keep the broth clear.\n\n3. **Make the Broth**: In a clean pot, add the rinsed bones along with 1 peeled onion, 4 stalks of bruised lemongrass, a piece of rock sugar, and 2 tablespoons of salt. \n\n4. **Add Beef Shank**: Include 1 kg of beef shank or brisket to the pot.\n\n5. **Simmer**: Bring the mixture to a boil again, then lower the heat. Cook for about 60-90 minutes, skimming occasionally to remove any foam or impurities.\n\n6. **Cook the Pork Hock**: If using, add 1 kg of pork hock to the pot. After about 45 minutes, the pork hock should be tender. Remove it and transfer to an ice water bowl to tighten the skin and make it crunchy.\n\n7. **Final Adjustments**: Taste the broth and adjust seasoning if necessary, adding fish sauce or stock powder to enhance the flavor.\n\nThis method will yield a flavorful pho broth that you can use for your pho dishes. According to [channel] in '[video title]'...",
+      "reference": "Simmer beef bones for several hours with spices like star anise, cinnamon, and cloves to make pho broth."
+    },
+    {
+      "question": "What are the key ingredients in Pad Thai?",
+      "answer": "I don't have that in my recipe database.",
+      "reference": "Pad Thai uses rice noodles, tamarind paste, fish sauce, eggs, bean sprouts, and peanuts."
+    },
+    {
+      "question": "How do I make Mapo Tofu?",
+      "answer": "To make Mapo Tofu, follow these step-by-step instructions:\n\n1. **Gather Ingredients**: You'll need soft tofu, ground meat (typically pork), Sichuan peppercorns, chili oil, garlic, ginger, soy sauce, and cornstarch.\n\n2. **Prepare Tofu**: Cut the soft tofu into big cubes. \n\n3. **Cook Meat**: In a pan, cook the ground meat until browned. \n\n4. **Add Aromatics**: Add minced garlic and ginger to the pan and saut\u00e9 until fragrant.\n\n5. **Make Sauce**: Stir in soy sauce and Sichuan peppercorns. Allow the mixture to simmer.\n\n6. **Thicken Sauce**: Mix cornstarch with a little water to create a slurry. Add this to the sauce and bring it to a boil to thicken.\n\n7. **Add Tofu**: Gently slide the tofu cubes into the sauce. Nudge them so they are sitting in the sauce without breaking them.\n\n8. **Simmer**: Let the tofu simmer in the sauce for a few minutes to absorb the flavors.\n\n9. **Finish**: Optionally, drizzle some chili oil on top before serving.\n\n10. **Serve**: Allow the tofu to cool slightly before serving, as hot tofu can burn your mouth.\n\nAccording to Pai's Kitchen in 'Mapo Tofu Recipe', this dish is a flavorful explosion of salty, spicy, and numbing flavors, with a creamy texture from the tofu. Enjoy your cooking!",
+      "reference": "Mapo Tofu is made with soft tofu, doubanjiang (spicy bean paste), ground pork, and Sichuan peppercorns."
+    },
+    {
+      "question": "What can I substitute for lemongrass?",
+      "answer": "If you really can't find lemongrass, lime zest does a decent job as a substitute. Additionally, lemongrass also comes frozen or dried; if you're using dried lemongrass, make sure to use more of it. According to [channel] in '[video title]'...",
+      "reference": "Lemongrass can be substituted with lemon zest combined with a small amount of ginger."
+    },
+    {
+      "question": "How long should I simmer pho bones?",
+      "answer": "I don't have that in my recipe database.",
+      "reference": "Pho bones should simmer for at least 6 to 8 hours to extract maximum flavor."
+    },
+    {
+      "question": "How do I make Char Siu pork?",
+      "answer": "To make Char Siu pork, follow these step-by-step instructions:\n\n1. **Select Your Meat**: Use a pork butt boneless shoulder roast for the best results. If you want to save money, you can opt for a whole fresh ham. Avoid using lean cuts like tenderloin or pork loin, as they will be less juicy and flavorful.\n\n2. **Cut the Meat**: Cut the pork into pieces suitable for marinating and roasting.\n\n3. **Make the Marinade**: Combine the following ingredients in a bowl:\n   - Sesame oil\n   - Shaoxing wine\n   - Soy sauce\n   - Hoisin sauce\n   - Grandma's molasses (or substitute with honey or dark brown sugar)\n   - Five spice powder\n   - White pepper\n   - Maltose (or honey if maltose is unavailable)\n\n4. **Marinate the Meat**: Coat the pork pieces thoroughly with the marinade. Place the marinated pork in the fridge and let it marinate overnight for the best flavor.\n\n5. **Prepare for Roasting**: The next day, preheat your oven. Set up a rack with some water in a pan (you can use a sheet pan or a deeper pan).\n\n6. **Roast the Pork**: Place the marinated pork on the rack and roast it at high heat initially. After some time, lower the temperature. During the roasting process, baste the pork with the marinade to enhance flavor and moisture.\n\n7. **Finish Cooking**: Continue roasting until the pork is cooked through and has a nice glaze.\n\n8. **Serve**: Once done, let it rest for a few minutes before slicing. Char Siu can be served with rice, in stir-fries, or as part of other dishes.\n\nAccording to [channel] in 'video title', this method will yield delicious homemade Char Siu that rivals your favorite restaurant!",
+      "reference": "Char Siu is made by marinating pork in honey, soy sauce, hoisin, and Chinese five spice, then roasting until caramelized."
+    },
+    {
+      "question": "What vegetables are used in Vietnamese spring rolls?",
+      "answer": "According to [channel] in 'how to make the Vietnamese fresh spring rolls', the vegetables used in Vietnamese spring rolls include onions, spring onions, and a garnish platter that may consist of Asian Thai basil and salted herbs. Additionally, bean sprouts are also used, which should be blanched in hot water for about 10 seconds.",
+      "reference": "Vietnamese spring rolls typically use lettuce, fresh mint, cilantro, cucumber, and rice paper wrappers."
+    },
+    {
+      "question": "How do I make dumpling dough?",
+      "answer": "To make dumpling dough, follow these step-by-step instructions:\n\n1. **Ingredients**: You will need 50g wheat starch, 25g potato starch, and 70g boiling water.\n\n2. **Mix the Starches**: In a bowl, mix the wheat starch and potato starch together until well combined.\n\n3. **Add Boiling Water**: Pour the boiling water into the starch mixture immediately.\n\n4. **Combine**: Use a spatula to mix the ingredients until they form a lump.\n\n5. **Knead the Dough**: Transfer the lump to a chopping board and knead it like washing laundry for about 2 minutes until smooth.\n\n6. **Rest the Dough**: Place the kneaded dough in a plastic bag to prevent it from drying out. Seal the bag well.\n\n7. **Let it Sit**: Allow the dough to rest for about 10 minutes.\n\n8. **Divide the Dough**: After resting, divide the dough into 15 pieces, each weighing about 10g.\n\n9. **Keep Covered**: Put the pieces in a plastic bag to keep them from drying out when not in use.\n\nAccording to [channel] in '[video title]'...",
+      "reference": "Dumpling dough is made with flour and water, kneaded until smooth, then rested before rolling thin."
+    },
+    {
+      "question": "What makes Tom Yum soup spicy?",
+      "answer": "Tom Yum soup gets its spiciness primarily from the addition of chili peppers. You can adjust the level of spiciness by adding more or fewer chilies according to your preference. Additionally, the use of Thai chili paste or Thai chili jam contributes to the heat, as it contains roasted chilies along with shallots and garlic. According to [channel] in 'video title', \"This is supposed to be a spicy soup, so add as much as you want.\"",
+      "reference": "Tom Yum gets its heat from fresh chilies and its aroma from lemongrass, galangal, and kaffir lime leaves."
+    },
+    {
+      "question": "How do I cook Kung Pao chicken?",
+      "answer": "To cook Kung Pao chicken, follow these step-by-step instructions:\n\n1. **Marinate the Chicken**:\n   - Take boneless chicken thighs (skinless and boned) and cut them into bite-sized pieces.\n   - In a bowl, combine the chicken with a little baking soda (to tenderize), cornstarch (to absorb flavors), a bit of water, a little oil (to prevent sticking), and soy sauce (for flavor and tenderness).\n   - Let the chicken marinate for about 10 to 15 minutes.\n\n2. **Prepare the Kung Pao Sauce**:\n   - In a separate bowl, start with oyster sauce and black vinegar.\n   - Add Chinese chili garlic sauce for heat and umami flavor.\n   - To thicken the sauce, create a slurry by mixing cornstarch with water in another bowl. Stir until smooth, then add this slurry to the sauce mixture to achieve the desired glaze consistency.\n\n3. **Prepare Vegetables and Aromatics**:\n   - Peel and slice ginger. You can also prepare other vegetables like bell peppers or zucchini, and any additional aromatics you prefer.\n\n4. **Cook the Chicken**:\n   - Heat a wok over high heat. Once hot, add the marinated chicken and stir-fry until cooked through.\n\n5. **Combine Everything**:\n   - Add the prepared vegetables and aromatics to the wok with the chicken. Stir-fry until the vegetables are tender-crisp.\n   - Pour the Kung Pao sauce over the chicken and vegetables, stirring to coat everything evenly.\n\n6. **Serve**:\n   - Once everything is well combined and heated through, serve your Kung Pao chicken hot, ideally with steamed rice.\n\nAccording to [Jet Tila] in 'Ready Jet Cook: Kung Pao Chicken', this dish is a classic stir-fry that combines protein, vegetables, and aromatics for incredible flavor. Enjoy your cooking!",
+      "reference": "Kung Pao chicken is stir-fried with dried chilies, Sichuan peppercorns, peanuts, and a sweet-savory sauce."
+    }
+  ]
+}
