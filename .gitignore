@@ -1,6 +1,5 @@
 .env
 chatbot-venv/
-data/chroma_db/
 .DS_Store
 __pycache__/
 *.pyc
