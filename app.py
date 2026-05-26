@@ -28,22 +28,15 @@ st.markdown("""
     padding: 0.5rem 1rem; border-radius: 4px;
     font-size: 0.85rem; margin-top: 0.5rem;
   }
+  section[data-testid="stSidebar"] > div {
+      padding-top: 0rem !important;
+      margin-top: -1rem !important;
+  }
 </style>
 """, unsafe_allow_html=True)
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## ⚙️ Settings")
-
-    iteration = st.selectbox(
-        "Prompt version",
-        ["v1", "v2", "v3"],
-        index=2,
-        help="v1=basic | v2=with citations | v3=full PhoBuddy"
-    )
-    os.environ["ITERATION"] = iteration
-
-    st.markdown("---")
     st.markdown("## 🎬 Add a Video")
     new_url = st.text_input("YouTube URL", placeholder="https://youtube.com/watch?v=...")
     if st.button("📥 Ingest Video", use_container_width=True):
