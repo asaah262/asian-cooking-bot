@@ -33,7 +33,7 @@ sacrebleu==2.4.3
 # giskard[llm]==0.9.12
 
 # Frontend
-streamlit==1.37.0
+streamlit==1.45.1
 
 # Utils
 python-dotenv==1.0.1
