@@ -7,10 +7,113 @@ Run with: streamlit run app.py
 
 import os
 import uuid
+import re
 import streamlit as st
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+# ── Helper functions ──────────────────────────────────────────────────────────
+
+def clean_query(query: str) -> str:
+    """Reframe photo/image requests as information requests."""
+    patterns = [
+        (r"can you show me (the )?(photo|image|picture) of (.+)", r"what is \3"),
+        (r"show me (the )?(photo|image|picture) of (.+)", r"what is \3"),
+        (r"(the )?(photo|image|picture) of (.+)", r"what is \3"),
+        (r"^show me (.+)", r"what is \1"),
+        (r"^can you show me (.+)", r"what is \1"),
+    ]
+    cleaned = query
+    for pattern, replacement in patterns:
+        result = re.sub(pattern, replacement, cleaned, flags=re.IGNORECASE)
+        if result != cleaned:
+            return result.strip()
+    return query
+
+
+def extract_search_term(query: str, answer: str = "") -> str | None:
+    """Extract the food/dish/ingredient name from query using LLM."""
+    from langchain_openai import ChatOpenAI
+    from langchain_core.output_parsers import StrOutputParser
+
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    result = (llm | StrOutputParser()).invoke(
+        f"""Extract the most specific food dish or ingredient name from this cooking context.
+    Prefer dish names over individual ingredients.
+    If not about food, reply 'NONE'.
+    Reply with just the food name, nothing else.
+
+    Examples:
+    "How do I make pho?" + "Pho Bo is a Vietnamese..." → "pho"
+    "what is nori?" + "Nori is seaweed..." → "nori"
+    "weather today?" + "..." → "NONE"
+    "how to cook duck coconut" + "Swimming Rama is..." → "Swimming Rama"
+
+    Query: {query}
+    Answer: {answer[:200]}
+    Food name:"""
+    )
+    term = result.strip()
+    return None if term == "NONE" else term
+
+
+def get_food_photo(query: str, answer: str = "") -> str | None:
+    """Match query to known video thumbnails, fallback to Unsplash."""
+
+    dish_thumbnails = {
+        "pho": "https://img.youtube.com/vi/5bIjDYEs6Qc/maxresdefault.jpg",
+        "spring roll": "https://img.youtube.com/vi/8CaadFo3sw0/maxresdefault.jpg",
+        "goi cuon": "https://img.youtube.com/vi/8CaadFo3sw0/maxresdefault.jpg",
+        "bun bo hue": "https://img.youtube.com/vi/qWK_HYlKrAA/maxresdefault.jpg",
+        "tom yum": "https://img.youtube.com/vi/ZcGqfJSo5hU/maxresdefault.jpg",
+        "duck curry": "https://img.youtube.com/vi/bHgRrOxdFyg/maxresdefault.jpg",
+        "thai duck": "https://img.youtube.com/vi/bHgRrOxdFyg/maxresdefault.jpg",
+        "duck": "https://img.youtube.com/vi/bHgRrOxdFyg/maxresdefault.jpg",
+        "basil chicken": "https://img.youtube.com/vi/q_9rDq2gGmg/maxresdefault.jpg",
+        "pad kra pao": "https://img.youtube.com/vi/q_9rDq2gGmg/maxresdefault.jpg",
+        "mapo tofu": "https://img.youtube.com/vi/TI2CeY6miDw/maxresdefault.jpg",
+        "swimming rama": "https://img.youtube.com/vi/k6NM3lIHCYQ/maxresdefault.jpg",
+        "kung pao": "https://img.youtube.com/vi/tjVu_2eQ9SE/maxresdefault.jpg",
+        "dumpling": "https://img.youtube.com/vi/LQS_mnNLG3Q/maxresdefault.jpg",
+        "char siu": "https://img.youtube.com/vi/By7NwdKdxpE/maxresdefault.jpg",
+        "pad thai": "https://img.youtube.com/vi/F86GfZIph8o/maxresdefault.jpg",
+    }
+
+    # Check query first, then answer
+    for text in [query.lower(), answer.lower()[:300]]:
+        for keyword, url in dish_thumbnails.items():
+            if re.search(r'\b' + re.escape(keyword) + r's?\b', text):
+                return url
+
+    # Fallback to Unsplash
+    search_term = extract_search_term(query, answer[:200])
+    if not search_term:
+        return None
+
+    import requests as req
+    key = os.getenv("UNSPLASH_ACCESS_KEY")
+    if not key:
+        return None
+    try:
+        response = req.get(
+            "https://api.unsplash.com/search/photos",
+            params={
+                "query": f"{search_term} food dish asian",
+                "per_page": 1,
+                "orientation": "landscape"
+            },
+            headers={"Authorization": f"Client-ID {key}"},
+            timeout=5
+        )
+        data = response.json()
+        if data["results"]:
+            return data["results"][0]["urls"]["small"]
+        return None
+    except Exception:
+        return None
+
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -88,13 +191,12 @@ with st.sidebar:
 
                             st.success(f"✅ Added! {len(docs)} chunks ingested")
                         else:
-                            st.error("❌ No transcript available for this video. Try a different one.")
+                            st.error("❌ No transcript available. Try a different video.")
 
                 except Exception as e:
                     st.error(f"❌ Error: {str(e)[:100]}")
         else:
             st.warning("Please enter a YouTube URL")
-    
 
     st.markdown("---")
     st.markdown("## 🍽️ Covered Cuisines")
@@ -151,6 +253,9 @@ except Exception as e:
 # ── Chat history ──────────────────────────────────────────────────────────────
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
+        photo_url = msg.get("photo_url")
+        if photo_url and msg["role"] == "assistant":
+            st.image(photo_url, use_column_width=True)
         st.markdown(msg["content"])
 
 # ── Input ─────────────────────────────────────────────────────────────────────
@@ -170,14 +275,27 @@ if user_input:
         with st.spinner("🍳 Cooking up an answer..."):
             try:
                 from agent import invoke_agent
+
+                # Clean query to prevent GPT image refusal
+                cleaned_input = clean_query(user_input)
+
                 answer = invoke_agent(
                     agent,
-                    user_input,
+                    cleaned_input,
                     thread_id=st.session_state.thread_id,
                 )
+
+                # Use original query for photo matching
+                photo_url = get_food_photo(user_input, answer)
+
+                if photo_url:
+                    st.image(photo_url, use_column_width=True)
                 st.markdown(answer)
+
                 st.session_state.messages.append({
-                    "role": "assistant", "content": answer
+                    "role": "assistant",
+                    "content": answer,
+                    "photo_url": photo_url,
                 })
             except Exception as e:
                 err = f"❌ Something went wrong: {e}"

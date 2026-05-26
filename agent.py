@@ -22,9 +22,6 @@ telemetry.Posthog.capture = lambda *args, **kwargs: None
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.tools import tool
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
 
@@ -56,37 +53,20 @@ def format_docs(docs):
 def search_cooking_knowledge(query: str) -> str:
     """
     Search the Asian cooking video knowledge base for recipes, techniques,
-    ingredients, and tips. Use this for ANY question about Vietnamese, Thai,
-    or Chinese cooking. Input should be a clear cooking question or topic.
+    ingredients, and tips. Use this for ANY food-related question FIRST.
+    If the result says 'I don't have that in my cooking video database',
+    then use search_web_for_recipe as fallback.
     """
-    vectorstore = get_vectorstore()
-    retriever   = vectorstore.as_retriever(search_kwargs={"k": 4})
+    from rag_chain import build_rag_chain
+    chain, retriever = build_rag_chain(iteration="v3")
+    config = {"configurable": {"session_id": "tool-session"}}
+    answer = chain.invoke({"input": query}, config=config)
 
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
+    # Check if RAG found nothing relevant
+    if "NOT_IN_DATABASE" in answer or "don't have that in my recipe database" in answer:
+        return "I don't have that in my cooking video database. Please use web search."
 
-    # LCEL RAG chain
-    rag_prompt = ChatPromptTemplate.from_template(
-        """You are an Asian cooking expert. Answer based ONLY on the context below.
-        Always mention which channel or video the information comes from.
-        If not in context, say "I don't have that in my cooking video database."
-
-        Context:
-        {context}
-
-        Question: {question}
-        """
-    )
-
-    rag_chain = (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
-        | rag_prompt
-        | llm
-        | StrOutputParser()
-    )
-
-    answer = rag_chain.invoke(query)
-
-    # Append source citations
+    # Append sources
     docs = retriever.invoke(query)
     seen, sources = set(), []
     for doc in docs:
@@ -94,9 +74,8 @@ def search_cooking_knowledge(query: str) -> str:
         if title not in seen:
             seen.add(title)
             sources.append(
-                f"  • {doc.metadata.get('channel')} — {doc.metadata.get('video_title')}"
+                f"  • {doc.metadata.get('channel')} — {title}"
             )
-
     if sources:
         answer += "\n\n📚 Sources:\n" + "\n".join(sources)
 
@@ -116,10 +95,21 @@ def summarize_dish(dish_name: str) -> str:
     docs = vectorstore.similarity_search(dish_name, k=6)
 
     if not docs:
-        return f"I don't have information about {dish_name} in my knowledge base yet."
+        return "NOT_IN_DATABASE"
 
-    context = "\n\n".join([d.page_content for d in docs])
-    sources = list({d.metadata.get("video_title", "") for d in docs})
+    # Check relevance — docs must actually mention the dish
+    dish_lower = dish_name.lower()
+    relevant_docs = [
+        d for d in docs
+        if dish_lower in d.page_content.lower()
+        or dish_lower in d.metadata.get("video_title", "").lower()
+    ]
+
+    if not relevant_docs:
+        return "NOT_IN_DATABASE"
+
+    context = "\n\n".join([d.page_content for d in relevant_docs])
+    sources = list({d.metadata.get("video_title", "") for d in relevant_docs})
 
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.1)
     prompt = f"""Based on these cooking video transcripts, give a structured
@@ -267,16 +257,27 @@ def build_agent():
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
 
     # System prompt passed directly at agent creation
-    system_prompt = """You are PhoBuddy 🍜, an expert AI cooking assistant
-        specialising in Vietnamese, Thai, and Chinese cuisine.
+    system_prompt = """You are PhoBuddy 🍜, an Asian cooking assistant.
 
-        How to use your tools:
-            - ALWAYS try search_cooking_knowledge first for any cooking question
-            - Use summarize_dish when the user asks "what is X?" or "tell me about X"
-            - Use ingest_new_video ONLY when the user gives you a YouTube URL
-            - Use search_web_for_recipe ONLY as last resort if RAG returns nothing useful
+    Your knowledge base covers these dishes:
+    - Vietnamese: Pho Bo, Bun Bo Hue, Fresh Spring Rolls (Goi Cuon)
+    - Thai: Tom Yum, Duck Curry, Basil Chicken, Swimming Rama, Pad Thai
+    - Chinese: Mapo Tofu, Kung Pao Chicken, Dumplings, Char Siu BBQ Pork
 
-        Be friendly, specific, and always cite your video sources."""
+    Tool routing rules:
+        - summarize_dish → "what is X?", "tell me about X", "show me X", 
+        "how to make X" — general dish overview questions
+        - search_cooking_knowledge → specific technique questions:
+        "how do I prevent X", "substitute for X", "how long", "what temperature",
+        "what spices", ingredient questions
+        - ingest_new_video → ONLY when user provides a YouTube URL
+        - search_web_for_recipe → ONLY when a tool returns NOT_IN_DATABASE
+
+    CRITICAL rules:
+    - Never mention images or photos in responses
+    - Never say "I can't provide images" or "I can't show photos"
+    - Answer exactly what was asked — be concise
+    - If not about food at all, answer directly without tools"""
 
     # MemorySaver for conversation history
     memory = MemorySaver()

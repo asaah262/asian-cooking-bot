@@ -115,7 +115,6 @@ def get_answer(question: str) -> dict:
     """
     Full RAG pipeline — traced in LangSmith.
     Returns {"answer": str, "contexts": list[str]}
-    Pattern from 3-_rag-202504.ipynb
     """
     docs   = retrieve_docs(question)
     context = format_docs(docs)
@@ -140,7 +139,6 @@ def get_answer(question: str) -> dict:
 
 
 # ── Predict function for LangSmith evaluate() ────────────────────────────────
-# Pattern from: 3-_rag-202504.ipynb
 
 def predict_rag_answer(example: dict) -> dict:
     """Wrapper called by LangSmith evaluate() for each example."""
@@ -155,7 +153,6 @@ def predict_rag_answer_with_context(example: dict) -> dict:
 
 
 # ── Evaluators (LLM-as-judge) ─────────────────────────────────────────────────
-# Pattern from: 3-_rag-202504.ipynb
 
 def answer_evaluator(run, example) -> dict:
     """
@@ -233,7 +230,6 @@ Score (0 = hallucination, 1 = grounded):"""),
 
 
 # ── ROUGE evaluation ──────────────────────────────────────────────────────────
-# Pattern from: 2-_rouge-evaluation-untrained-vs-trained-llm-202504.ipynb
 
 def run_rouge_evaluation(results: list[dict]) -> dict:
     """
@@ -264,7 +260,6 @@ def run_rouge_evaluation(results: list[dict]) -> dict:
 
 
 # ── LangSmith dataset setup ───────────────────────────────────────────────────
-# Pattern from: 3-_rag-202504.ipynb
 
 def setup_langsmith_dataset() -> str:
     """Create the evaluation dataset in LangSmith (once)."""
@@ -375,7 +370,6 @@ def run_evaluation():
 def run_giskard_evaluation():
     """
     Auto-generate test questions from ChromaDB and evaluate the agent.
-    Pattern from 4-_evaluating-rag-giskard-202504.ipynb
 
     Run for iteration v3 to get an impressive auto-evaluation.
     """
