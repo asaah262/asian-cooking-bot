@@ -46,7 +46,7 @@ DATASET_NAME  = "asian-cooking-bot-eval"
 QA_PAIRS = [
     {
         "question": "How do I make pho broth from scratch?",
-        "answer": "Simmer beef bones for several hours with spices like star anise, cinnamon, and cloves to make pho broth."
+        "answer": "Start by blanching beef bones in boiling water for 5-10 minutes, rinse well, then simmer with charred ginger, onion, star anise, cinnamon sticks, and black cardamom for 1-2 hours. Season with fish sauce, rock sugar, and salt."
     },
     {
         "question": "What are the key ingredients in Pad Thai?",
@@ -54,35 +54,35 @@ QA_PAIRS = [
     },
     {
         "question": "How do I make Mapo Tofu?",
-        "answer": "Mapo Tofu is made with soft tofu, doubanjiang (spicy bean paste), ground pork, and Sichuan peppercorns."
+        "answer": "Mapo Tofu uses soft tofu, ground beef or pork, Sichuan peppercorns, soy sauce, and chili oil. Saute the meat, add tofu gently, simmer and thicken with potato starch."
     },
     {
         "question": "What can I substitute for lemongrass?",
-        "answer": "Lemongrass can be substituted with lemon zest combined with a small amount of ginger."
+        "answer": "If you can't find fresh lemongrass, use lime zest or dried lemongrass. Use more dried lemongrass as it has less concentrated flavor."
     },
     {
         "question": "How long should I simmer pho bones?",
-        "answer": "Pho bones should simmer for at least 6 to 8 hours to extract maximum flavor."
+        "answer": "After blanching and rinsing the bones, simmer the pho broth for about 1 to 2 hours over medium heat, skimming regularly."
     },
     {
         "question": "How do I make Char Siu pork?",
-        "answer": "Char Siu is made by marinating pork in honey, soy sauce, hoisin, and Chinese five spice, then roasting until caramelized."
+        "answer": "Marinate pork with soy sauce, honey, hoisin sauce, and Chinese five spice, then roast until caramelized and slightly charred on the outside."
     },
     {
         "question": "What vegetables are used in Vietnamese spring rolls?",
-        "answer": "Vietnamese spring rolls typically use lettuce, fresh mint, cilantro, cucumber, and rice paper wrappers."
+        "answer": "Vietnamese spring rolls use spring onions, Asian Thai basil, bean sprouts, cucumber, and herbs like sawtooth coriander, wrapped in rice paper."
     },
     {
         "question": "How do I make dumpling dough?",
-        "answer": "Dumpling dough is made with flour and water, kneaded until smooth, then rested before rolling thin."
+        "answer": "Mix 50g wheat starch and 25g potato starch with 70g boiling water, knead until smooth, then rest before rolling thin."
     },
     {
         "question": "What makes Tom Yum soup spicy?",
-        "answer": "Tom Yum gets its heat from fresh chilies and its aroma from lemongrass, galangal, and kaffir lime leaves."
+        "answer": "Tom Yum gets its spiciness from fresh Thai chilies, which are pounded in a mortar to distribute heat evenly throughout the soup."
     },
     {
         "question": "How do I cook Kung Pao chicken?",
-        "answer": "Kung Pao chicken is stir-fried with dried chilies, Sichuan peppercorns, peanuts, and a sweet-savory sauce."
+        "answer": "Stir fry chicken with dried chilies, Sichuan peppercorns, peanuts, and a sauce of soy sauce, vinegar, and sugar in a hot wok."
     },
 ]
 
