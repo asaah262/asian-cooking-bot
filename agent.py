@@ -58,7 +58,7 @@ def search_cooking_knowledge(query: str) -> str:
     then use search_web_for_recipe as fallback.
     """
     from rag_chain import build_rag_chain
-    chain, retriever = build_rag_chain(iteration="v3")
+    chain, retriever = build_rag_chain(iteration="v4")
     config = {"configurable": {"session_id": "tool-session"}}
     answer = chain.invoke({"input": query}, config=config)
 

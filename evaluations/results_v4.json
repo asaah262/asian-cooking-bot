@@ -1,0 +1,71 @@
+{
+  "summary": {
+    "iteration": "v4",
+    "chunk_size": "500",
+    "chunk_overlap": "150",
+    "timestamp": "2026-05-27T12:11:32.075670",
+    "rouge_scores": {
+      "rouge1": 0.18581015592077543,
+      "rouge2": 0.059134969416739395,
+      "rougeL": 0.14633239327044636,
+      "rougeLsum": 0.1449994691886285
+    },
+    "langsmith_experiments": {
+      "correctness": "cooking-bot-v4",
+      "hallucination": "cooking-bot-v4-hallucination"
+    },
+    "langsmith_url": "https://smith.langchain.com"
+  },
+  "details": [
+    {
+      "question": "How do I make pho broth from scratch?",
+      "answer": "To make pho broth from scratch, start by parboiling beef bones in a pot of water for about 5 minutes with some salt and vinegar to remove impurities. Then, rinse the bones and place them in a pot filled with fresh water. Add ingredients like a peeled onion, bruised lemongrass, rock sugar, and salt. Bring to a boil, then lower the heat and simmer for 60-90 minutes, skimming occasionally for clarity. According to [channel] in '[video title]'...",
+      "reference": "Simmer beef bones for several hours with spices like star anise, cinnamon, and cloves to make pho broth."
+    },
+    {
+      "question": "What are the key ingredients in Pad Thai?",
+      "answer": "According to [channel] in 'video title', key ingredients in Pad Thai include shrimp, bean sprouts, garlic chives, lime, and peanuts. Additionally, a good sauce is essential, which typically includes fish sauce, sugar, and Thai chili paste for flavor.",
+      "reference": "Pad Thai uses rice noodles, tamarind paste, fish sauce, eggs, bean sprouts, and peanuts."
+    },
+    {
+      "question": "How do I make Mapo Tofu?",
+      "answer": "NOT_IN_DATABASE",
+      "reference": "Mapo Tofu is made with soft tofu, doubanjiang (spicy bean paste), ground pork, and Sichuan peppercorns."
+    },
+    {
+      "question": "What can I substitute for lemongrass?",
+      "answer": "If you really can't find lemongrass, lime zest does a decent job as a substitute. Lemongrass also comes frozen and dried, but if you're using dried lemongrass, make sure to use more of it. According to [channel] in '[video title]'...",
+      "reference": "Lemongrass can be substituted with lemon zest combined with a small amount of ginger."
+    },
+    {
+      "question": "How long should I simmer pho bones?",
+      "answer": "NOT_IN_DATABASE",
+      "reference": "Pho bones should simmer for at least 6 to 8 hours to extract maximum flavor."
+    },
+    {
+      "question": "How do I make Char Siu pork?",
+      "answer": "To make Char Siu pork, start by cutting your pork into pieces and preparing a marinade with sesame oil, shaoxing wine, soy sauce, hoisin sauce, molasses (or honey), five spice powder, and white pepper. Marinate the meat overnight in the fridge. The next day, roast it at high heat, then lower the temperature while basting it. This method ensures a sticky and flavorful Char Siu. According to [channel] in '[video title]'...",
+      "reference": "Char Siu is made by marinating pork in honey, soy sauce, hoisin, and Chinese five spice, then roasting until caramelized."
+    },
+    {
+      "question": "What vegetables are used in Vietnamese spring rolls?",
+      "answer": "According to [channel] in 'video title', Vietnamese spring rolls are garnished with onions, spring onions, Asian Thai basil, salted herbs, and blanched bean sprouts. These ingredients contribute to the fresh and vibrant flavors of the dish.",
+      "reference": "Vietnamese spring rolls typically use lettuce, fresh mint, cilantro, cucumber, and rice paper wrappers."
+    },
+    {
+      "question": "How do I make dumpling dough?",
+      "answer": "To make dumpling dough, mix 50g wheat starch and 25g potato starch in a bowl. Gradually add 70g boiling water to the mixture and stir with a spatula until it forms a lump. Knead the dough for about 2 minutes, then place it in a plastic bag to prevent it from drying out. According to [channel] in '[video title]'...",
+      "reference": "Dumpling dough is made with flour and water, kneaded until smooth, then rested before rolling thin."
+    },
+    {
+      "question": "What makes Tom Yum soup spicy?",
+      "answer": "Tom Yum soup gets its spiciness primarily from the addition of chilies and chili paste. The use of fresh chilies, along with Thai chili paste or Thai chili jam, contributes to its fiery flavor profile. According to [channel] in 'video title', you can adjust the spice level by adding more or fewer chilies based on your preference.",
+      "reference": "Tom Yum gets its heat from fresh chilies and its aroma from lemongrass, galangal, and kaffir lime leaves."
+    },
+    {
+      "question": "How do I cook Kung Pao chicken?",
+      "answer": "To cook Kung Pao chicken, start by marinating boneless chicken thighs in a mixture of baking soda, cornstarch, a little water, oil, and soy sauce for about 10 to 15 minutes. Then, prepare the Kung Pao sauce by combining oyster sauce, black vinegar, and Chinese chili garlic sauce, and create a slurry with cornstarch and water to thicken it. Stir-fry the marinated chicken with vegetables and aromatics in a wok, then add the sauce to finish the dish. According to [channel] in 'Ready Jet Cook', this dish is quick to prepare and yields incredible flavor.",
+      "reference": "Kung Pao chicken is stir-fried with dried chilies, Sichuan peppercorns, peanuts, and a sweet-savory sauce."
+    }
+  ]
+}
