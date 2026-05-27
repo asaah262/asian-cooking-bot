@@ -255,7 +255,7 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         photo_url = msg.get("photo_url")
         if photo_url and msg["role"] == "assistant":
-            st.image(photo_url, use_column_width=True)
+            st.image(photo_url,use_container_width=True)
         st.markdown(msg["content"])
 
 # ── Input ─────────────────────────────────────────────────────────────────────
@@ -289,7 +289,7 @@ if user_input:
                 photo_url = get_food_photo(user_input, answer)
 
                 if photo_url:
-                    st.image(photo_url, use_column_width=True)
+                    st.image(photo_url, use_container_width=True)
                 st.markdown(answer)
 
                 st.session_state.messages.append({
