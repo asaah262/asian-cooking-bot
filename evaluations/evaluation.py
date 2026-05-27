@@ -370,56 +370,60 @@ def run_evaluation():
 def run_giskard_evaluation():
     """
     Auto-generate test questions from ChromaDB and evaluate the agent.
-
-    Run for iteration v3 to get an impressive auto-evaluation.
+    Run for iteration v4 to get an impressive auto-evaluation.
     """
     try:
         from giskard.rag import KnowledgeBase, generate_testset, evaluate as gsk_evaluate
         import pandas as pd
+        import pickle
 
         print("\n🤖 Running Giskard auto-evaluation...")
 
-        # Build knowledge base from ChromaDB docs
-        embeddings  = OpenAIEmbeddings(model="text-embedding-3-small")
+        # Build knowledge base from ChromaDBn
+        from langchain_openai import OpenAIEmbeddings
+        from langchain_chroma import Chroma
+
+        embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
         vectorstore = Chroma(
             collection_name="asian_cooking",
             embedding_function=embeddings,
             persist_directory=CHROMA_PATH,
         )
         all_docs = vectorstore.get()
-        df = pd.DataFrame(
+        df_giskard = pd.DataFrame(
             [{"text": doc} for doc in all_docs["documents"]],
             columns=["text"]
         )
 
-        kb = KnowledgeBase(df)
+        kb_giskard = KnowledgeBase(df_giskard)
 
-        # Auto-generate test questions (costs OpenAI tokens)
         test_questions = generate_testset(
-            kb,
+            kb_giskard,
             num_questions=20,
-            agent_description="An Asian cooking assistant that answers questions about Vietnamese, Thai, and Chinese recipes",
+            agent_description="Asian cooking assistant for Vietnamese, Thai and Chinese recipes.",
         )
 
+        # Save kb to avoid re-spending tokens
+        pickle.dump(kb_giskard, open('evaluations/kb_giskard.pkl', 'wb'))
+
         # Evaluation function
-        def use_agent(question: str, history=None) -> str:
+        def use_agent(question, history=None):
             result = get_answer(question)
             return result["answer"]
 
         report = gsk_evaluate(
             use_agent,
             testset=test_questions,
-            knowledge_base=kb,
+            knowledge_base=kb_giskard,
         )
 
         print("✅ Giskard evaluation complete!")
-        print(report)
+        print(report.correctness_by_question_type())
         return report
 
     except ImportError:
         print("⚠️  Giskard not installed. Run: pip install 'giskard[llm]'")
         return None
-
 
 if __name__ == "__main__":
     import argparse
