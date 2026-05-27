@@ -213,11 +213,12 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### 💡 Try asking:")
     examples = [
+        "How do I make dumplings?",
+        "How do I roll Vietnamese spring rolls?",
+        "How do I make Char Siu pork?",
         "How do I make pho broth?",
-        "What's in Pad Thai?",
-        "How do I fold dumplings?",
-        "Substitute for fish sauce?",
-        "Tell me about Mapo Tofu",
+        "Tell me about Pad Thai",
+        "What can I substitute for lemongrass?",
     ]
     for eq in examples:
         if st.button(eq, use_container_width=True, key=f"ex_{eq}"):
