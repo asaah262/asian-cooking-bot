@@ -8,6 +8,7 @@ Run with: streamlit run app.py
 import os
 import uuid
 import re
+import hashlib
 import streamlit as st
 import requests as req
 from langchain_openai import ChatOpenAI
@@ -23,6 +24,22 @@ load_dotenv()
 
 
 # ── Helper functions ──────────────────────────────────────────────────────────
+
+def get_config(name: str, default: str | None = None) -> str | None:
+    """Read config from .env locally or Streamlit Secrets in deployment."""
+    value = os.getenv(name)
+    if value and not value.startswith("YOUR_"):
+        return value
+
+    try:
+        secret_value = st.secrets.get(name)
+    except Exception:
+        secret_value = None
+
+    if secret_value and not str(secret_value).startswith("YOUR_"):
+        return str(secret_value)
+    return default
+
 
 def clean_query(query: str) -> str:
     """Reframe photo/image requests as information requests."""
@@ -47,6 +64,116 @@ def display_image(url: str) -> None:
         st.image(url, use_container_width=True)
     except TypeError:
         st.image(url, use_column_width=True)
+
+
+PRONUNCIATION_HINTS = [
+    (r"\bpho(\s+bo)?\b", "Pho Bo is pronounced fuh baw."),
+    (r"\bbun bo hue\b", "Bun Bo Hue is pronounced boon baw hway."),
+    (r"\bgoi cuon\b|\bspring roll", "Goi Cuon is pronounced goy koo-un."),
+    (r"\bpad thai\b", "Pad Thai is pronounced pad tie."),
+    (r"\btom yum(\s+goong)?\b", "Tom Yum Goong is pronounced tom yum goong."),
+    (r"\bpad kra pao\b|\bbasil chicken\b", "Pad Kra Pao is pronounced pad kra pow."),
+    (r"\bmapo tofu\b", "Mapo Tofu is pronounced mah-po tofu."),
+    (r"\bchar siu\b", "Char Siu is pronounced char syoo."),
+    (r"\bdumpling", "Dumplings are pronounced duhm-plings."),
+    (r"\blemongrass\b", "Lemongrass is pronounced lemon grass."),
+]
+
+
+def get_pronunciation_hint(text: str) -> str:
+    """Return a short spoken pronunciation hint for known demo dishes."""
+    lower_text = text.lower()
+    for pattern, hint in PRONUNCIATION_HINTS:
+        if re.search(pattern, lower_text):
+            return hint
+    return ""
+
+
+def prepare_tts_text(answer: str, query: str = "") -> str:
+    """Convert markdown-heavy assistant text into natural speech."""
+    hint = get_pronunciation_hint(f"{query}\n{answer}")
+
+    spoken = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", answer)
+    spoken = re.sub(r"`([^`]+)`", r"\1", spoken)
+    spoken = re.sub(r"[*_#>•|]+", " ", spoken)
+    spoken = re.sub(r"https?://\S+", "", spoken)
+    spoken = re.sub(r"\s+", " ", spoken).strip()
+
+    try:
+        max_chars = int(get_config("ELEVENLABS_MAX_CHARS", "1200"))
+    except ValueError:
+        max_chars = 1200
+    if len(spoken) > max_chars:
+        spoken = spoken[:max_chars].rsplit(" ", 1)[0] + "."
+
+    return f"{hint} {spoken}".strip()
+
+
+def tts_cache_key(text: str, voice_id: str, model_id: str) -> str:
+    raw = f"{voice_id}:{model_id}:{text}".encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()[:16]
+
+
+def generate_elevenlabs_audio(text: str, voice_id: str, model_id: str) -> bytes:
+    """Generate MP3 audio with ElevenLabs."""
+    api_key = get_config("ELEVENLABS_API_KEY")
+    if not api_key:
+        raise RuntimeError("Missing ELEVENLABS_API_KEY")
+
+    response = req.post(
+        f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+        params={"output_format": "mp3_44100_128"},
+        headers={
+            "xi-api-key": api_key,
+            "Content-Type": "application/json",
+            "Accept": "audio/mpeg",
+        },
+        json={
+            "text": text,
+            "model_id": model_id,
+            "voice_settings": {
+                "stability": 0.45,
+                "similarity_boost": 0.85,
+                "style": 0.25,
+                "use_speaker_boost": True,
+            },
+        },
+        timeout=30,
+    )
+    if response.status_code == 401:
+        raise RuntimeError(
+            "ElevenLabs rejected the API key (401). Check ELEVENLABS_API_KEY and restart the app."
+        )
+    response.raise_for_status()
+    return response.content
+
+
+def render_tts_control(answer: str, query: str, key: str) -> None:
+    """Render an optional ElevenLabs listen button for an assistant answer."""
+    if not get_config("ELEVENLABS_API_KEY"):
+        return
+
+    voice_id = get_config("ELEVENLABS_VOICE_ID", "JBFqnCBsd6RMkjVDRZzb")
+    model_id = get_config("ELEVENLABS_MODEL_ID", "eleven_multilingual_v2")
+    tts_text = prepare_tts_text(answer, query)
+    audio_key = tts_cache_key(tts_text, voice_id, model_id)
+
+    if "audio_cache" not in st.session_state:
+        st.session_state.audio_cache = {}
+
+    if st.button("🔊 Listen", key=f"listen_{key}_{audio_key}"):
+        with st.spinner("Generating voice..."):
+            try:
+                st.session_state.audio_cache[audio_key] = generate_elevenlabs_audio(
+                    tts_text,
+                    voice_id,
+                    model_id,
+                )
+            except Exception as exc:
+                st.warning(f"Voice unavailable: {str(exc)[:120]}")
+
+    if audio_key in st.session_state.audio_cache:
+        st.audio(st.session_state.audio_cache[audio_key], format="audio/mp3")
 
 
 def extract_search_term(query: str, answer: str = "") -> str | None:
@@ -101,7 +228,7 @@ def get_food_photo(query: str, answer: str = "") -> str | None:
             if re.search(r'\b' + re.escape(keyword) + r's?\b', text):
                 return url
 
-    key = os.getenv("UNSPLASH_ACCESS_KEY")
+    key = get_config("UNSPLASH_ACCESS_KEY")
     if not key:
         return None
 
@@ -188,18 +315,18 @@ with st.sidebar:
         st.rerun()
 
     st.markdown("---")
-    st.markdown("### 💡 Try asking:")
-    examples = [
-        "How do I make dumplings?",
-        "How do I roll Vietnamese spring rolls?",
-        "How do I make Char Siu pork?",
-        "How do I make pho broth?",
-        "Tell me about Pad Thai",
-        "What can I substitute for lemongrass?",
+    st.markdown("### 💡 Try asking")
+    demo_prompts = [
+        ("🍜 Pho broth", "How do I make pho broth from scratch?"),
+        ("🥢 Pad Thai", "Tell me about Pad Thai"),
+        ("🍖 Char Siu", "How do I make Char Siu pork?"),
+        ("🥟 Dumpling tips", "How do I prevent dumplings from sticking?"),
+        ("🔥 Tom Yum", "What makes Tom Yum soup spicy?"),
+        ("🌿 Lemongrass swap", "What can I substitute for lemongrass?"),
     ]
-    for eq in examples:
-        if st.button(eq, use_container_width=True, key=f"ex_{eq}"):
-            st.session_state.pending = eq
+    for label, prompt in demo_prompts:
+        if st.button(label, use_container_width=True, key=f"ex_{label}", help=prompt):
+            st.session_state.pending = prompt
 
 # ── Main UI ───────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -228,12 +355,18 @@ except Exception as e:
     st.stop()
 
 # ── Chat history ──────────────────────────────────────────────────────────────
-for msg in st.session_state.messages:
+for idx, msg in enumerate(st.session_state.messages):
     with st.chat_message(msg["role"]):
         photo_url = msg.get("photo_url")
         if photo_url and msg["role"] == "assistant":
             display_image(photo_url)
         st.markdown(msg["content"])
+        if msg["role"] == "assistant":
+            render_tts_control(
+                msg["content"],
+                msg.get("query", ""),
+                msg.get("id", f"history_{idx}"),
+            )
 
 # ── Input ─────────────────────────────────────────────────────────────────────
 user_input = st.chat_input("Ask me anything about Asian cooking... 🥢")
@@ -266,11 +399,15 @@ if user_input:
                 if photo_url:
                     display_image(photo_url)
                 st.markdown(answer)
+                message_id = str(uuid.uuid4())
+                render_tts_control(answer, user_input, message_id)
 
                 st.session_state.messages.append({
+                    "id": message_id,
                     "role": "assistant",
                     "content": answer,
                     "photo_url": photo_url,
+                    "query": user_input,
                 })
             except Exception as e:
                 err = f"❌ Something went wrong: {e}"

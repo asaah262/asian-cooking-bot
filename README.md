@@ -18,6 +18,7 @@ and deployed on Streamlit Cloud.
 
 - 🍜 Ask cooking questions in natural language
 - 📸 Automatic food photos with every answer
+- 🔊 Optional ElevenLabs voice playback for answers
 - 🔍 RAG retrieval from 15 YouTube cooking videos
 - 🧠 Conversation memory across turns
 - 🌐 Web search fallback for unknown dishes
@@ -50,6 +51,7 @@ cp .env.example .env
 #   OPENAI_API_KEY
 #   LANGCHAIN_API_KEY (from smith.langchain.com)
 #   UNSPLASH_ACCESS_KEY (from unsplash.com/developers)
+#   ELEVENLABS_API_KEY (optional, for voice playback)
 ```
 
 ### 3. Ingest videos
@@ -242,3 +244,11 @@ screenshots/
 | `CHUNK_OVERLAP` | ✅ | Chunk overlap for text splitting |
 | `ITERATION` | ✅ | Prompt version (v1/v2/v3/v4/v5) |
 | `UNSPLASH_ACCESS_KEY` | 🟡 Optional | Food photos |
+| `ELEVENLABS_API_KEY` | 🟡 Optional | Voice playback |
+| `ELEVENLABS_VOICE_ID` | 🟡 Optional | ElevenLabs voice ID |
+| `ELEVENLABS_MODEL_ID` | 🟡 Optional | ElevenLabs TTS model |
+| `ELEVENLABS_MAX_CHARS` | 🟡 Optional | Max answer chars sent to TTS |
+
+For Streamlit Cloud, add these values in **App settings → Secrets** as well.
+After changing `.env` locally, restart `streamlit run app.py` so the new
+ElevenLabs key is loaded.
