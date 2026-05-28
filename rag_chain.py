@@ -22,7 +22,6 @@ telemetry.Posthog.capture = lambda *args, **kwargs: None
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import trim_messages
@@ -32,7 +31,7 @@ from langchain_core.chat_history import BaseChatMessageHistory
 load_dotenv()
 
 CHROMA_DB_PATH = os.getenv("CHROMA_DB_PATH", "./data/chroma_db")
-ITERATION      = os.getenv("ITERATION", "v1")
+ITERATION      = os.getenv("ITERATION", "v5")
 
 # ── Prompt Templates — one per iteration ──────────────────────────────────────
 
@@ -105,13 +104,70 @@ Context:
 {context}
 """
 
-SYSTEM_PROMPTS = {"v1": SYSTEM_V1, "v2": SYSTEM_V2, "v3": SYSTEM_V3, "v4": SYSTEM_V4}
+SYSTEM_V5 = """You are PhoBuddy 🍜, an expert AI cooking assistant
+specialising in Vietnamese, Thai, and Chinese cuisine.
+
+The context below is made of retrieved transcript chunks. Each chunk begins with
+a source line like:
+Source: [channel] — [video title] ([url]) | chunk X of Y
+
+ABSOLUTE RULES:
+- NEVER say "I can't provide images", "I can't show photos"
+- NEVER mention photography or visual content
+- Use ONLY the transcript context below for factual cooking claims
+- Do not invent source names, channels, video titles, URLs, measurements, or times
+- If the context has no relevant mention of the user's topic, respond exactly:
+  "NOT_IN_DATABASE"
+
+Answer rules:
+- Answer exactly what was asked, in a concise home-cook friendly way
+- Cite real sources from the Source lines, for example:
+  "According to Pailin's Kitchen in 'Pad Thai'..."
+- For ingredient, substitution, timing, or troubleshooting questions, give 2-4
+  practical sentences unless the user asks for a full recipe
+- If the context is only partially relevant, say what the videos do cover and
+  avoid filling gaps from outside knowledge
+
+Cuisine cheat-sheet:
+🇻🇳 Vietnamese: fish sauce, lemongrass, fresh herbs, light broths
+🇹🇭 Thai: galangal, kaffir lime, coconut milk, chili paste
+🇨🇳 Chinese: soy sauce, oyster sauce, wok technique, five spice
+
+Context:
+{context}
+"""
+
+SYSTEM_PROMPTS = {
+    "v1": SYSTEM_V1,
+    "v2": SYSTEM_V2,
+    "v3": SYSTEM_V3,
+    "v4": SYSTEM_V4,
+    "v5": SYSTEM_V5,
+}
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
+def format_doc(doc):
+    """Format one retrieved chunk with citation metadata for the LLM."""
+    metadata = doc.metadata or {}
+    channel = metadata.get("channel") or "Unknown channel"
+    title = metadata.get("video_title") or "Unknown video"
+    url = metadata.get("video_url") or ""
+    chunk_index = metadata.get("chunk_index")
+    total_chunks = metadata.get("total_chunks")
+
+    source = f"Source: {channel} — {title}"
+    if url:
+        source += f" ({url})"
+    if chunk_index is not None and total_chunks is not None:
+        source += f" | chunk {chunk_index + 1} of {total_chunks}"
+
+    return f"{source}\nTranscript:\n{doc.page_content}"
+
+
 def format_docs(docs):
-    """Join retrieved doc chunks into a single context string."""
-    return "\n\n".join(doc.page_content for doc in docs)
+    """Join retrieved chunks with source metadata so citations stay grounded."""
+    return "\n\n---\n\n".join(format_doc(doc) for doc in docs)
 
 
 def get_vectorstore():

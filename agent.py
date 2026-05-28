@@ -15,6 +15,7 @@ Pattern:
 """
 
 import os
+import uuid
 from dotenv import load_dotenv
 import chromadb.telemetry.product.posthog as telemetry
 telemetry.Posthog.capture = lambda *args, **kwargs: None
@@ -24,11 +25,15 @@ from langchain_chroma import Chroma
 from langchain_core.tools import tool
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
+from ingest import ingest_single_video
+from rag_chain import build_rag_chain, format_docs
+from langchain_community.tools import DuckDuckGoSearchRun
+
 
 load_dotenv()
 
 CHROMA_DB_PATH = os.getenv("CHROMA_DB_PATH", "./data/chroma_db")
-ITERATION      = os.getenv("ITERATION", "v3")
+ITERATION      = os.getenv("ITERATION", "v5")
 
 
 # ── Shared helpers ────────────────────────────────────────────────────────────
@@ -41,9 +46,6 @@ def get_vectorstore():
         persist_directory=CHROMA_DB_PATH,
     )
 
-def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)
-
 
 # ── Tool 1: RAG Search ────────────────────────────────────────────────────────
 # Pattern: @tool decorator
@@ -52,14 +54,15 @@ def format_docs(docs):
 @tool
 def search_cooking_knowledge(query: str) -> str:
     """
-    Search the Asian cooking video knowledge base for recipes, techniques,
-    ingredients, and tips. Use this for ANY food-related question FIRST.
-    If the result says 'I don't have that in my cooking video database',
-    then use search_web_for_recipe as fallback.
+    Search for specific cooking details: techniques, substitutions, timing,
+    temperatures, ingredient amounts, troubleshooting, or step-by-step recipe
+    questions. Do NOT use for general dish overview questions like "what is X",
+    "tell me about X", "show me X", or "give me an overview of X"; use
+    summarize_dish for those first.
     """
-    from rag_chain import build_rag_chain
-    chain, retriever = build_rag_chain(iteration="v4")
-    config = {"configurable": {"session_id": "tool-session"}}
+    
+    chain, retriever = build_rag_chain(iteration=ITERATION)
+    config = {"configurable": {"session_id": f"rag-tool-{uuid.uuid4()}"}}
     answer = chain.invoke({"input": query}, config=config)
 
     # Check if RAG found nothing relevant
@@ -87,9 +90,12 @@ def search_cooking_knowledge(query: str) -> str:
 @tool
 def summarize_dish(dish_name: str) -> str:
     """
-    Get a structured summary of a dish including what it is, key ingredients,
-    cooking method, and pro tips. Use when user asks 'what is X?' or
-    'tell me about X'. Input: dish name like 'Pho', 'Pad Thai', 'Mapo Tofu'.
+    Get a structured overview of a known dish: what it is, key ingredients,
+    cooking method, cook time, and pro tips. Use this FIRST for general dish
+    overview questions such as "what is X", "tell me about X", "show me X",
+    "describe X", or "give me an overview of X". Do not use for step-by-step
+    recipe, substitution, timing, temperature, or troubleshooting questions.
+    Input should be only the dish name.
     """
     vectorstore = get_vectorstore()
     docs = vectorstore.similarity_search(dish_name, k=6)
@@ -108,12 +114,16 @@ def summarize_dish(dish_name: str) -> str:
     if not relevant_docs:
         return "NOT_IN_DATABASE"
 
-    context = "\n\n".join([d.page_content for d in relevant_docs])
-    sources = list({d.metadata.get("video_title", "") for d in relevant_docs})
+    context = format_docs(relevant_docs)
+    sources = sorted({
+        f"{d.metadata.get('channel', 'Unknown channel')} — "
+        f"{d.metadata.get('video_title', 'Unknown video')}"
+        for d in relevant_docs
+    })
 
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.1)
-    prompt = f"""Based on these cooking video transcripts, give a structured
-    summary of {dish_name}:
+    prompt = f"""Based only on these cooking video transcript excerpts, give a
+    structured summary of {dish_name}. Use the source lines exactly when citing:
 
     {context}
 
@@ -138,82 +148,20 @@ def ingest_new_video(youtube_url: str) -> str:
     Use ONLY when the user provides a YouTube URL.
     Input: a valid YouTube URL.
     """
-    import re
-    import time
-    from langchain_openai import OpenAIEmbeddings
-    from langchain_chroma import Chroma
-    from langchain.text_splitter import RecursiveCharacterTextSplitter
-    from langchain.schema import Document
-    from youtube_transcript_api import YouTubeTranscriptApi
-
-    # Extract video ID
-    patterns = [
-        r"(?:v=)([a-zA-Z0-9_-]{11})",
-        r"(?:youtu\.be/)([a-zA-Z0-9_-]{11})",
-    ]
-    video_id = None
-    for pattern in patterns:
-        match = re.search(pattern, youtube_url)
-        if match:
-            video_id = match.group(1)
-            break
-
-    if not video_id:
-        return f"❌ Invalid YouTube URL: {youtube_url}"
-
-    # Check if already in DB
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    vectorstore = Chroma(
-        collection_name="asian_cooking",
-        embedding_function=embeddings,
-        persist_directory=CHROMA_DB_PATH,
-    )
-    existing = vectorstore.get()
-    existing_ids = {m.get("video_id") for m in existing["metadatas"] if m}
-    if video_id in existing_ids:
-        return f"⏭️ This video is already in the knowledge base! (ID: {video_id})"
-
-    # Fetch transcript
     try:
-        ytt_api = YouTubeTranscriptApi()
-        try:
-            fetched = ytt_api.fetch(video_id, languages=['en'])
-        except Exception:
-            fetched = ytt_api.fetch(video_id)
-        full_text = " ".join([entry.text for entry in fetched])
-        # Clean transcript
-        full_text = re.sub(r'\[.*?\]', '', full_text)
-        full_text = re.sub(r'\s+', ' ', full_text).strip()
+        result = ingest_single_video(youtube_url)
     except Exception as e:
-        return f"❌ Could not fetch transcript: {e}"
+        return f"❌ Could not ingest video: {e}"
 
-    # Chunk and ingest
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=int(os.getenv("CHUNK_SIZE", 1000)),
-        chunk_overlap=int(os.getenv("CHUNK_OVERLAP", 100)),
-    )
-    chunks = splitter.split_text(full_text)
-    documents = [
-        Document(
-            page_content=chunk,
-            metadata={
-                "video_id":    video_id,
-                "video_url":   youtube_url,
-                "video_title": f"User-added video ({video_id})",
-                "channel":     "User-added",
-                "cuisine":     "Asian",
-                "tags":        "",
-                "chunk_index": i,
-                "total_chunks": len(chunks),
-            }
-        )
-        for i, chunk in enumerate(chunks)
-    ]
-    vectorstore.add_documents(documents)
+    if result["status"] == "duplicate":
+        return f"⏭️ This video is already in the knowledge base! (ID: {result['video_id']})"
+
+    if result["status"] == "no_transcript":
+        return "❌ Could not fetch a transcript for this video."
 
     return (
-        f"✅ Video ingested successfully! Added {len(chunks)} chunks.\n"
-        f"Video ID: {video_id}\n"
+        f"✅ Video ingested successfully! Added {result['chunks']} chunks.\n"
+        f"Video ID: {result['video_id']}\n"
         f"You can now ask questions about this video!"
     )
 
@@ -228,7 +176,6 @@ def search_web_for_recipe(query: str) -> str:
     Input: a specific cooking question.
     """
     try:
-        from langchain_community.tools import DuckDuckGoSearchRun
         search = DuckDuckGoSearchRun()
         return "🌐 Web search results:\n" + search.run(query + " Asian cooking recipe")
     except Exception as e:
@@ -248,8 +195,8 @@ def build_agent():
         print(resp["messages"][-1].content)
     """
     tools = [
-        search_cooking_knowledge,
         summarize_dish,
+        search_cooking_knowledge,
         ingest_new_video,
         search_web_for_recipe,
     ]
@@ -265,11 +212,13 @@ def build_agent():
     - Chinese: Mapo Tofu, Kung Pao Chicken, Dumplings, Char Siu BBQ Pork
 
     Tool routing rules:
-        - summarize_dish → "what is X?", "tell me about X", "show me X", 
-        "how to make X" — general dish overview questions
-        - search_cooking_knowledge → specific technique questions:
-        "how do I prevent X", "substitute for X", "how long", "what temperature",
-        "what spices", ingredient questions
+        - summarize_dish → MUST use first for general dish overview questions:
+        "what is X?", "tell me about X", "show me X", "describe X",
+        "give me an overview of X"
+        - search_cooking_knowledge → MUST use for procedural or specific
+        cooking questions: "how do I make/cook/prepare X", "how do I prevent X",
+        "substitute for X", "how long", "what temperature", "what spices",
+        ingredient quantities, step-by-step recipes, troubleshooting
         - ingest_new_video → ONLY when user provides a YouTube URL
         - search_web_for_recipe → ONLY when a tool returns NOT_IN_DATABASE
 

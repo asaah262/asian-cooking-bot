@@ -9,7 +9,15 @@ import os
 import uuid
 import re
 import streamlit as st
+import requests as req
+from langchain_openai import ChatOpenAI
+from langchain_core.output_parsers import StrOutputParser
+from ingest import ingest_single_video
+from agent import invoke_agent
+from agent import build_agent
+
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -33,10 +41,16 @@ def clean_query(query: str) -> str:
     return query
 
 
+def display_image(url: str) -> None:
+    """Render images across both old and new Streamlit versions."""
+    try:
+        st.image(url, use_container_width=True)
+    except TypeError:
+        st.image(url, use_column_width=True)
+
+
 def extract_search_term(query: str, answer: str = "") -> str | None:
     """Extract the food/dish/ingredient name from query using LLM."""
-    from langchain_openai import ChatOpenAI
-    from langchain_core.output_parsers import StrOutputParser
 
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
     result = (llm | StrOutputParser()).invoke(
@@ -87,15 +101,15 @@ def get_food_photo(query: str, answer: str = "") -> str | None:
             if re.search(r'\b' + re.escape(keyword) + r's?\b', text):
                 return url
 
-    # Fallback to Unsplash
+    key = os.getenv("UNSPLASH_ACCESS_KEY")
+    if not key:
+        return None
+
+    # Fallback to Unsplash only when the API key exists.
     search_term = extract_search_term(query, answer[:200])
     if not search_term:
         return None
 
-    import requests as req
-    key = os.getenv("UNSPLASH_ACCESS_KEY")
-    if not key:
-        return None
     try:
         response = req.get(
             "https://api.unsplash.com/search/photos",
@@ -107,9 +121,11 @@ def get_food_photo(query: str, answer: str = "") -> str | None:
             headers={"Authorization": f"Client-ID {key}"},
             timeout=5
         )
+        response.raise_for_status()
         data = response.json()
-        if data["results"]:
-            return data["results"][0]["urls"]["small"]
+        results = data.get("results", [])
+        if results:
+            return results[0]["urls"]["small"]
         return None
     except Exception:
         return None
@@ -146,52 +162,13 @@ with st.sidebar:
         if new_url:
             with st.spinner("Fetching transcript... (max 15 seconds)"):
                 try:
-                    from ingest import fetch_transcript, build_documents, extract_video_id
-                    from langchain_openai import OpenAIEmbeddings
-                    from langchain_chroma import Chroma
-                    import json
-
-                    video_id = extract_video_id(new_url)
-
-                    # Check duplicate
-                    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-                    vectorstore = Chroma(
-                        collection_name="asian_cooking",
-                        embedding_function=embeddings,
-                        persist_directory="./data/chroma_db",
-                    )
-                    existing = vectorstore.get()
-                    existing_ids = {m.get("video_id") for m in existing["metadatas"] if m}
-
-                    if video_id in existing_ids:
+                    result = ingest_single_video(new_url)
+                    if result["status"] == "duplicate":
                         st.warning("⏭️ Already in knowledge base!")
+                    elif result["status"] == "no_transcript":
+                        st.error("❌ No transcript available. Try a different video.")
                     else:
-                        transcript = fetch_transcript(new_url)
-                        if transcript:
-                            video_meta = {
-                                "url": new_url,
-                                "title": f"User-added ({video_id})",
-                                "channel": "User-added",
-                                "cuisine": "Asian",
-                                "tags": [],
-                            }
-                            docs = build_documents(video_meta, transcript)
-                            vectorstore.add_documents(docs)
-
-                            # Auto-save to videos.json
-                            try:
-                                with open("videos.json", "r") as f:
-                                    existing_videos = json.load(f)
-                                if new_url not in [v["url"] for v in existing_videos]:
-                                    existing_videos.append(video_meta)
-                                    with open("videos.json", "w") as f:
-                                        json.dump(existing_videos, f, indent=2)
-                            except Exception:
-                                pass
-
-                            st.success(f"✅ Added! {len(docs)} chunks ingested")
-                        else:
-                            st.error("❌ No transcript available. Try a different video.")
+                        st.success(f"✅ Added! {result['chunks']} chunks ingested")
 
                 except Exception as e:
                     st.error(f"❌ Error: {str(e)[:100]}")
@@ -241,7 +218,6 @@ if "pending"   not in st.session_state: st.session_state.pending   = None
 # ── Load agent (cached) ───────────────────────────────────────────────────────
 @st.cache_resource(show_spinner="Loading PhoBuddy 🍜...")
 def load_agent():
-    from agent import build_agent
     return build_agent()
 
 try:
@@ -256,7 +232,7 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         photo_url = msg.get("photo_url")
         if photo_url and msg["role"] == "assistant":
-            st.image(photo_url,use_container_width=True)
+            display_image(photo_url)
         st.markdown(msg["content"])
 
 # ── Input ─────────────────────────────────────────────────────────────────────
@@ -275,8 +251,6 @@ if user_input:
     with st.chat_message("assistant"):
         with st.spinner("🍳 Cooking up an answer..."):
             try:
-                from agent import invoke_agent
-
                 # Clean query to prevent GPT image refusal
                 cleaned_input = clean_query(user_input)
 
@@ -290,7 +264,7 @@ if user_input:
                 photo_url = get_food_photo(user_input, answer)
 
                 if photo_url:
-                    st.image(photo_url, use_container_width=True)
+                    display_image(photo_url)
                 st.markdown(answer)
 
                 st.session_state.messages.append({

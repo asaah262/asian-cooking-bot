@@ -15,17 +15,19 @@ import json
 import time
 import re
 import logging
+import yt_dlp
+import shutil
+import argparse
+import chromadb
 from pathlib import Path
 from typing import Optional
-
-from dotenv import load_dotenv
+from youtube_transcript_api import YouTubeTranscriptApi
 from tqdm import tqdm
-
-from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound, TranscriptsDisabled
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langchain.schema import Document
+from dotenv import load_dotenv
 
 load_dotenv()
 import chromadb.telemetry.product.posthog as telemetry
@@ -38,6 +40,7 @@ CHROMA_DB_PATH = os.getenv("CHROMA_DB_PATH", "./data/chroma_db")
 CHUNK_SIZE     = int(os.getenv("CHUNK_SIZE", 1000))
 CHUNK_OVERLAP  = int(os.getenv("CHUNK_OVERLAP", 100))
 VIDEOS_FILE    = "videos.json"
+COLLECTION_NAME = "asian_cooking"
 DELAY_BETWEEN  = 3   # seconds between YT requests to prevent hammering YT!
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -48,6 +51,7 @@ def extract_video_id(url: str) -> str:
         r"(?:v=)([a-zA-Z0-9_-]{11})",
         r"(?:youtu\.be/)([a-zA-Z0-9_-]{11})",
         r"(?:embed/)([a-zA-Z0-9_-]{11})",
+        r"(?:shorts/)([a-zA-Z0-9_-]{11})",
     ]
     for pattern in patterns:
         match = re.search(pattern, url)
@@ -74,8 +78,6 @@ def fetch_via_transcript_api(video_id: str) -> Optional[str]:
     Returns None if not possible.
     """
     try:
-        from youtube_transcript_api import YouTubeTranscriptApi
-        
         # New API in v1.0+ — fetch directly
         ytt_api = YouTubeTranscriptApi()
         
@@ -105,7 +107,6 @@ def fetch_via_ytdlp(video_id: str, output_dir: str = "./data/subs") -> Optional[
     Use yt-dlp to download subtitles ONLY (no video/audio) WITHOUT CREDENTIALS.
     """
     try:
-        import yt_dlp
         Path(output_dir).mkdir(parents=True, exist_ok=True)
 
         ydl_opts = {
@@ -211,6 +212,122 @@ def build_documents(video_meta: dict, transcript: str) -> list[Document]:
     return documents
 
 
+def make_user_video_metadata(url: str) -> dict:
+    """Create default metadata for a video added by the user."""
+    video_id = extract_video_id(url)
+    return {
+        "url": url,
+        "title": f"User-added ({video_id})",
+        "channel": "User-added",
+        "cuisine": "Asian",
+        "tags": [],
+    }
+
+
+def save_video_metadata(video_meta: dict, videos_file: str = VIDEOS_FILE) -> None:
+    """Append a video to videos.json if it is not already listed."""
+    path = Path(videos_file)
+    existing_videos = []
+    if path.exists():
+        existing_videos = json.loads(path.read_text(encoding="utf-8"))
+
+    known_urls = {video.get("url") for video in existing_videos}
+    if video_meta["url"] not in known_urls:
+        existing_videos.append(video_meta)
+        path.write_text(
+            json.dumps(existing_videos, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+
+
+def _catalog_metadata(video_meta: dict, video_id: str) -> dict:
+    """Metadata fields that should match videos.json for every stored chunk."""
+    tags = video_meta.get("tags", [])
+    if isinstance(tags, list):
+        tags = ", ".join(tags)
+
+    return {
+        "video_id": video_id,
+        "video_url": video_meta["url"],
+        "video_title": video_meta.get("title", f"User-added ({video_id})"),
+        "channel": video_meta.get("channel", "User-added"),
+        "cuisine": video_meta.get("cuisine", "Asian"),
+        "tags": tags or "",
+    }
+
+
+def _existing_video_ids(vectorstore: Chroma) -> set[str]:
+    existing = vectorstore.get()
+    return {m.get("video_id") for m in existing.get("metadatas", []) if m}
+
+
+def ingest_single_video(youtube_url: str, save_to_catalog: bool = True) -> dict:
+    """
+    Add one YouTube video to ChromaDB using the same pipeline as the CLI.
+    Returns a small status dict for UI/tool callers.
+    """
+    video_id = extract_video_id(youtube_url)
+    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+    vectorstore = Chroma(
+        collection_name=COLLECTION_NAME,
+        embedding_function=embeddings,
+        persist_directory=CHROMA_DB_PATH,
+    )
+
+    if video_id in _existing_video_ids(vectorstore):
+        return {"status": "duplicate", "video_id": video_id, "chunks": 0}
+
+    transcript = fetch_transcript(youtube_url)
+    if not transcript:
+        return {"status": "no_transcript", "video_id": video_id, "chunks": 0}
+
+    video_meta = make_user_video_metadata(youtube_url)
+    documents = build_documents(video_meta, transcript)
+    vectorstore.add_documents(documents)
+
+    if save_to_catalog:
+        save_video_metadata(video_meta)
+
+    return {"status": "ingested", "video_id": video_id, "chunks": len(documents)}
+
+
+def sync_catalog_metadata(videos: list[dict], chroma_path: str = CHROMA_DB_PATH) -> int:
+    """
+    Update stored Chroma metadata to match videos.json without re-embedding.
+    Useful when a video was first added as "User-added" and later curated.
+    """
+    client = chromadb.PersistentClient(path=chroma_path)
+    try:
+        collection = client.get_collection(COLLECTION_NAME)
+    except Exception:
+        log.warning("No Chroma collection found to sync")
+        return 0
+
+    updated_count = 0
+    for video in videos:
+        video_id = extract_video_id(video["url"])
+        existing = collection.get(where={"video_id": video_id}, include=["metadatas"])
+        ids = existing.get("ids", [])
+        metadatas = existing.get("metadatas", [])
+        if not ids:
+            continue
+
+        target = _catalog_metadata(video, video_id)
+        changed_ids, changed_metadatas = [], []
+        for doc_id, metadata in zip(ids, metadatas):
+            new_metadata = dict(metadata or {})
+            new_metadata.update(target)
+            if new_metadata != metadata:
+                changed_ids.append(doc_id)
+                changed_metadatas.append(new_metadata)
+
+        if changed_ids:
+            collection.update(ids=changed_ids, metadatas=changed_metadatas)
+            updated_count += len(changed_ids)
+
+    return updated_count
+
+
 def ingest_videos(videos: list[dict], reset_db: bool = False) -> Chroma:
     """
     Main ingestion pipeline:
@@ -230,17 +347,21 @@ def ingest_videos(videos: list[dict], reset_db: bool = False) -> Chroma:
 
     # Optionally wipe DB between iterations
     if reset_db:
-        import shutil
         if Path(CHROMA_DB_PATH).exists():
             shutil.rmtree(CHROMA_DB_PATH)
             log.info("🗑️  Wiped existing ChromaDB")
 
     # Load or create ChromaDB
     vectorstore = Chroma(
-        collection_name="asian_cooking",
+        collection_name=COLLECTION_NAME,
         embedding_function=embeddings,
         persist_directory=CHROMA_DB_PATH,
     )
+
+    if not reset_db:
+        synced = sync_catalog_metadata(videos)
+        if synced:
+            log.info(f"🔄 Synced metadata for {synced} existing chunk(s)")
 
     # Check which videos already ingested (avoid re-embedding)
     existing = vectorstore.get()
@@ -292,11 +413,11 @@ def ingest_videos(videos: list[dict], reset_db: bool = False) -> Chroma:
 # ── CLI entry point ───────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    import argparse
-
     parser = argparse.ArgumentParser(description="Ingest YouTube cooking videos into ChromaDB")
     parser.add_argument("--reset", action="store_true",
                         help="Wipe ChromaDB before ingesting (use between iterations)")
+    parser.add_argument("--sync-metadata", action="store_true",
+                        help="Update Chroma metadata from videos.json without fetching transcripts")
     parser.add_argument("--videos", default=VIDEOS_FILE,
                         help="Path to videos.json file")
     parser.add_argument("--single", type=str, default=None,
@@ -316,4 +437,8 @@ if __name__ == "__main__":
         with open(args.videos, "r") as f:
             videos = json.load(f)
 
-    ingest_videos(videos, reset_db=args.reset)
+    if args.sync_metadata:
+        updated = sync_catalog_metadata(videos)
+        log.info(f"🔄 Synced metadata for {updated} chunk(s)")
+    else:
+        ingest_videos(videos, reset_db=args.reset)

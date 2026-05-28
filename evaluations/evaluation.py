@@ -11,35 +11,39 @@ Usage:
   ITERATION=v1 python evaluation/evaluate.py
   ITERATION=v2 python evaluation/evaluate.py
   ITERATION=v3 python evaluation/evaluate.py
+  ITERATION=v5 python evaluation/evaluate.py
 """
 
 import os
 import sys
 import json
-import time
+import argparse
+import importlib
 from datetime import datetime
-
-from dotenv import load_dotenv
-load_dotenv()
-
-# LangSmith auto-traces when env vars set
-os.environ["LANGCHAIN_TRACING_V2"] = "true"
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from langsmith import Client, traceable
 from langsmith.evaluation import evaluate as ls_evaluate
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
-ITERATION     = os.getenv("ITERATION", "v1")
+from dotenv import load_dotenv
+load_dotenv()
+# LangSmith auto-traces when env vars set
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+from agent import build_agent, invoke_agent
+from rag_chain import format_doc
+
+ITERATION     = os.getenv("ITERATION", "v5")
 CHUNK_SIZE    = os.getenv("CHUNK_SIZE", "1000")
 CHUNK_OVERLAP = os.getenv("CHUNK_OVERLAP", "100")
 CHROMA_PATH   = os.getenv("CHROMA_DB_PATH", "./data/chroma_db")
 DATASET_NAME  = "asian-cooking-bot-eval"
+_EVAL_AGENT   = None
 
 # ── 10 fixed test Q&A pairs (same across all iterations for fair comparison) ──
 
@@ -100,7 +104,15 @@ def get_retriever():
 
 
 def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)
+    return "\n\n---\n\n".join(format_doc(doc) for doc in docs)
+
+
+def get_eval_agent():
+    """Build the same agent used by the Streamlit app once per evaluation run."""
+    global _EVAL_AGENT
+    if _EVAL_AGENT is None:
+        _EVAL_AGENT = build_agent()
+    return _EVAL_AGENT
 
 
 @traceable()
@@ -113,28 +125,19 @@ def retrieve_docs(question: str):
 @traceable()
 def get_answer(question: str) -> dict:
     """
-    Full RAG pipeline — traced in LangSmith.
+    Production app path — traced in LangSmith.
     Returns {"answer": str, "contexts": list[str]}
     """
-    docs   = retrieve_docs(question)
-    context = format_docs(docs)
-
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
-
-    from rag_chain import SYSTEM_PROMPTS
-    system = SYSTEM_PROMPTS.get(ITERATION, SYSTEM_PROMPTS["v1"])
-
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", system),
-        ("human", "{input}"),
-    ])
-
-    chain = prompt | llm | StrOutputParser()
-    answer = chain.invoke({"input": question, "context": context})
+    docs = retrieve_docs(question)
+    answer = invoke_agent(
+        get_eval_agent(),
+        question,
+        thread_id=f"eval-{ITERATION}-{abs(hash(question))}",
+    )
 
     return {
         "answer":   answer,
-        "contexts": [str(doc) for doc in docs],
+        "contexts": [format_doc(doc) for doc in docs],
     }
 
 
@@ -237,7 +240,6 @@ def run_rouge_evaluation(results: list[dict]) -> dict:
     Uses HuggingFace evaluate library — as taught in class.
     """
     try:
-        import importlib
         hf_evaluate = importlib.import_module('evaluate')
         rouge = hf_evaluate.load("rouge")
 
@@ -304,6 +306,7 @@ def run_evaluation():
         data=dataset_name,
         evaluators=[answer_evaluator],
         experiment_prefix=f"cooking-bot-{ITERATION}",
+        max_concurrency=1,
         metadata={
             "iteration":     ITERATION,
             "chunk_size":    CHUNK_SIZE,
@@ -318,6 +321,7 @@ def run_evaluation():
         data=dataset_name,
         evaluators=[hallucination_evaluator],
         experiment_prefix=f"cooking-bot-{ITERATION}-hallucination",
+        max_concurrency=1,
         metadata={"iteration": ITERATION},
     )
 
@@ -331,7 +335,6 @@ def run_evaluation():
             "answer":    result["answer"],
             "reference": qa["answer"],
         })
-        time.sleep(0.5)
 
     rouge_scores = run_rouge_evaluation(local_results)
 
@@ -380,8 +383,6 @@ def run_giskard_evaluation():
         print("\n🤖 Running Giskard auto-evaluation...")
 
         # Build knowledge base from ChromaDBn
-        from langchain_openai import OpenAIEmbeddings
-        from langchain_chroma import Chroma
 
         embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
         vectorstore = Chroma(
@@ -426,7 +427,6 @@ def run_giskard_evaluation():
         return None
 
 if __name__ == "__main__":
-    import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--giskard", action="store_true",
                         help="Also run Giskard auto-evaluation (v3 only)")

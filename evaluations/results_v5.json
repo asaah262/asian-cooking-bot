@@ -1,0 +1,71 @@
+{
+  "summary": {
+    "iteration": "v5",
+    "chunk_size": "500",
+    "chunk_overlap": "150",
+    "timestamp": "2026-05-28T18:44:33.015149",
+    "rouge_scores": {
+      "rouge1": 0.29452262383621175,
+      "rouge2": 0.10015027634899566,
+      "rougeL": 0.22427212807157793,
+      "rougeLsum": 0.23336814546353593
+    },
+    "langsmith_experiments": {
+      "correctness": "cooking-bot-v5",
+      "hallucination": "cooking-bot-v5-hallucination"
+    },
+    "langsmith_url": "https://smith.langchain.com"
+  },
+  "details": [
+    {
+      "question": "How do I make pho broth from scratch?",
+      "answer": "To make pho broth from scratch, follow these steps:\n\n1. **Prepare the Bones**: Use beef bones and place them in a pot filled with water. Bring it to a boil over high heat.\n\n2. **Remove Impurities**: Boil for about 5 to 10 minutes. You'll see impurities rise to the top; dump out the water and rinse the bones to keep the broth clear.\n\n3. **Simmer the Broth**: Place the cleaned bones in fresh water and simmer for several hours to extract the flavors.\n\n4. **Add Aromatics**: Include spices like star anise, cloves, and cinnamon during the simmering process for additional depth.\n\nThis method will help you create a rich and flavorful pho broth.",
+      "reference": "Start by blanching beef bones in boiling water for 5-10 minutes, rinse well, then simmer with charred ginger, onion, star anise, cinnamon sticks, and black cardamom for 1-2 hours. Season with fish sauce, rock sugar, and salt."
+    },
+    {
+      "question": "What are the key ingredients in Pad Thai?",
+      "answer": "The key ingredients in Pad Thai include:\n\n- Rice noodles\n- Bean sprouts\n- Shrimp\n- Other proteins (such as chicken or tofu)\n- Seasonings (like tamarind paste, fish sauce, and sugar)\n\nThese ingredients create the dish's signature balance of flavors and textures.",
+      "reference": "Pad Thai uses rice noodles, tamarind paste, fish sauce, eggs, bean sprouts, and peanuts."
+    },
+    {
+      "question": "How do I make Mapo Tofu?",
+      "answer": "To make Mapo Tofu, you'll need the following ingredients:\n\n- Soft tofu\n- Minced garlic\n- Shallots\n- Chili\n- Soy sauce\n- Spicy sauce of your choice (like chili sauce)\n- Water\n\n### Steps:\n1. **Prepare Tofu**: Press the soft tofu to remove excess water, then cut it into small cubes.\n2. **Fry Aromatics**: In a pan, fry the minced garlic, shallots, and chili until fragrant.\n3. **Add Tofu**: Gently add the tofu cubes to the pan.\n4. **Mix in Sauces**: Add soy sauce, your chosen spicy sauce, and a bit of water to create a rich sauce.\n5. **Cook Together**: Cook everything together until heated through and well combined.\n\nEnjoy your flavorful Mapo Tofu!",
+      "reference": "Mapo Tofu uses soft tofu, ground beef or pork, Sichuan peppercorns, soy sauce, and chili oil. Saute the meat, add tofu gently, simmer and thicken with potato starch."
+    },
+    {
+      "question": "What can I substitute for lemongrass?",
+      "answer": "You can substitute lemongrass with lime zest, which provides a similar flavor. Additionally, if you have dried lemongrass, use more of it to achieve a comparable taste. Frozen lemongrass is also an option if fresh isn't available.",
+      "reference": "If you can't find fresh lemongrass, use lime zest or dried lemongrass. Use more dried lemongrass as it has less concentrated flavor."
+    },
+    {
+      "question": "How long should I simmer pho bones?",
+      "answer": "You should simmer pho bones for about one to two hours after boiling them for 5 to 10 minutes to remove impurities. This simmering time helps develop a rich flavor in the broth.",
+      "reference": "After blanching and rinsing the bones, simmer the pho broth for about 1 to 2 hours over medium heat, skimming regularly."
+    },
+    {
+      "question": "How do I make Char Siu pork?",
+      "answer": "To make Char Siu pork, follow these steps:\n\n### Ingredients for Marinade:\n- Sesame oil\n- Shaoxing wine\n- Soy sauce\n- Hoisin sauce\n- Molasses\n- Five spice powder\n- White pepper\n- Maltose or honey\n\n### Instructions:\n1. **Prepare the Marinade**: Mix all the marinade ingredients in a bowl.\n2. **Marinate the Pork**: Cut pork (usually pork shoulder) into strips and marinate in the mixture. For best flavor, marinate overnight.\n3. **Roasting**: Preheat your oven. Place the marinated pork on a rack over a baking tray to catch drippings. Roast until cooked through and caramelized, basting with leftover marinade occasionally.\n4. **Serving**: Slice the pork and serve it in various dishes like stir-fries or pork fried rice.\n\nEnjoy your Char Siu pork!",
+      "reference": "Marinate pork with soy sauce, honey, hoisin sauce, and Chinese five spice, then roast until caramelized and slightly charred on the outside."
+    },
+    {
+      "question": "What vegetables are used in Vietnamese spring rolls?",
+      "answer": "Vietnamese fresh spring rolls (Goi Cuon) typically include the following vegetables:\n\n- Lettuce\n- Mint leaves\n- Cilantro\n- Bean sprouts\n- Carrots (julienned)\n- Cucumber (julienned)\n\nThese fresh vegetables add flavor and crunch to the rolls.",
+      "reference": "Vietnamese spring rolls use spring onions, Asian Thai basil, bean sprouts, cucumber, and herbs like sawtooth coriander, wrapped in rice paper."
+    },
+    {
+      "question": "How do I make dumpling dough?",
+      "answer": "To make dumpling dough, follow these steps:\n\n1. Mix 50g of wheat starch and 25g of potato starch in a bowl.\n2. Gradually add 70g of boiling water to the starch mixture and stir until it forms a lump.\n3. Knead the dough for about 2 minutes until smooth.\n4. Place the dough in a plastic bag to prevent it from drying out and let it rest for about 10 minutes.\n5. After resting, divide the dough into small pieces for your dumplings.\n\nThis method will give you a good base for your dumpling wrappers!",
+      "reference": "Mix 50g wheat starch and 25g potato starch with 70g boiling water, knead until smooth, then rest before rolling thin."
+    },
+    {
+      "question": "What makes Tom Yum soup spicy?",
+      "answer": "Tom Yum soup is spicy mainly due to the use of Thai bird's eye chilies or Thai chili paste, which add significant heat. The combination of these chilies with other aromatic ingredients like lemongrass, galangal, and kaffir lime leaves enhances the overall flavor while contributing to its spiciness.",
+      "reference": "Tom Yum gets its spiciness from fresh Thai chilies, which are pounded in a mortar to distribute heat evenly throughout the soup."
+    },
+    {
+      "question": "How do I cook Kung Pao chicken?",
+      "answer": "To cook Kung Pao Chicken, follow these steps:\n\n### Ingredients:\n- Chicken breast (1 lb), diced\n- Soy sauce (2 tablespoons for marinating, additional for sauce)\n- Water (for marinating)\n- Oil (for marinating and cooking)\n- Oyster sauce (2 tablespoons)\n- Black vinegar (1 tablespoon)\n- Vegetables (like bell peppers, onions, and ginger)\n- Roasted peanuts (1/2 cup)\n- Dried red chilies (3-4, adjust for spice)\n- Green onions (for garnish)\n\n### Instructions:\n\n1. **Marinate the Chicken**:\n   - Mix chicken with water, oil, and soy sauce. Let it marinate for 10 to 15 minutes.\n\n2. **Prepare the Sauce**:\n   - Combine oyster sauce and black vinegar, diluting with water to achieve the desired consistency.\n\n3. **Cook the Chicken**:\n   - Heat oil in a pan, stir-fry the marinated chicken until cooked through, then remove from the pan.\n\n4. **Stir-Fry Vegetables**:\n   - In the same pan, add vegetables and dried red chilies. Stir-fry until tender.\n\n5. **Combine**:\n   - Return the chicken to the pan, add the sauce, and stir well.\n\n6. **Add Peanuts**:\n   - Stir in roasted peanuts and cook for another minute.\n\n7. **Serve**:\n   - Garnish with green onions and serve hot with rice.\n\nThis dish is known for its sweet, sour, and spicy flavors. Enjoy your cooking!",
+      "reference": "Stir fry chicken with dried chilies, Sichuan peppercorns, peanuts, and a sauce of soy sauce, vinegar, and sugar in a hot wok."
+    }
+  ]
+}
