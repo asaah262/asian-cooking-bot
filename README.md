@@ -10,7 +10,7 @@ and deployed on Streamlit Cloud.
 
 **Stack**: LangChain · LangGraph · ChromaDB · GPT-4o-mini · LangSmith · Streamlit · Unsplash
 
-🌐 **Live App**: [PhoBuddy on Streamlit Cloud](https://asian-cooking-bot-cpkc3vyb9bkw8ktdtdxhvn.streamlit.app/)
+🌐 **Live App**: [PhoBuddy on Streamlit Cloud](https://asian-cooking-bot.streamlit.app/)
 
 ---
 
